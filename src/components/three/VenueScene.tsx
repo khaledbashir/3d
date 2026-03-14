@@ -1,5 +1,7 @@
 import { useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
+import { Environment } from '@react-three/drei'
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import { useVenueStore } from '@/stores/venueStore'
 import { Stadium } from './Stadium'
 import { Arena } from './Arena'
@@ -33,7 +35,7 @@ function CameraController() {
 function OrbitHandler() {
   const { gl } = useThree()
   const setTargetCamera = useVenueStore(s => s.setTargetCamera)
-  const targetCamera = useVenueStore(s => s.targetCamera)
+
   const isDragging = useRef(false)
   const lastMouse = useRef({ x: 0, y: 0 })
 
@@ -65,7 +67,6 @@ function OrbitHandler() {
       })
     }
 
-    // Touch
     const onTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 1) {
         isDragging.current = true
@@ -155,7 +156,6 @@ function LEDScreens() {
 
 function SimulationRunner() {
   const simulating = useVenueStore(s => s.simulating)
-  const zones = useVenueStore(s => s.zones)
   const lastSim = useRef(0)
 
   useFrame(({ clock }) => {
@@ -180,15 +180,50 @@ function SimulationRunner() {
 export function VenueScene() {
   return (
     <>
-      {/* Lighting */}
-      <ambientLight color="#334455" intensity={0.6} />
+      {/* Lighting — multi-source for realism */}
+      <ambientLight color="#1a2540" intensity={0.4} />
+
+      {/* Main key light — warm overhead */}
       <directionalLight
-        position={[100, 200, 100]}
-        intensity={0.8}
+        position={[80, 180, 60]}
+        intensity={1.2}
+        color="#fff5e8"
         castShadow
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[4096, 4096]}
+        shadow-camera-near={1}
+        shadow-camera-far={500}
+        shadow-camera-left={-150}
+        shadow-camera-right={150}
+        shadow-camera-top={150}
+        shadow-camera-bottom={-150}
+        shadow-bias={-0.0002}
       />
-      <fog attach="fog" args={['#000a1a', 100, 600]} />
+
+      {/* Fill light — cool blue from opposite side */}
+      <directionalLight
+        position={[-60, 100, -40]}
+        intensity={0.3}
+        color="#4488cc"
+      />
+
+      {/* Rim light — subtle backlight for depth */}
+      <directionalLight
+        position={[0, 50, -120]}
+        intensity={0.2}
+        color="#6688bb"
+      />
+
+      {/* Ground bounce light */}
+      <hemisphereLight
+        color="#1a3050"
+        groundColor="#0a0a14"
+        intensity={0.3}
+      />
+
+      {/* Environment map for realistic reflections */}
+      <Environment preset="night" background={false} />
+
+      <fog attach="fog" args={['#000a1a', 150, 700]} />
 
       <CameraController />
       <OrbitHandler />
@@ -197,7 +232,18 @@ export function VenueScene() {
       <VenueGeometry />
       <LEDScreens />
       <CrowdForVenue />
-      <Particles />
+      <Particles count={200} />
+
+      {/* Post-processing */}
+      <EffectComposer>
+        <Bloom
+          intensity={0.6}
+          luminanceThreshold={0.4}
+          luminanceSmoothing={0.9}
+          mipmapBlur
+        />
+        <Vignette darkness={0.4} offset={0.3} />
+      </EffectComposer>
     </>
   )
 }

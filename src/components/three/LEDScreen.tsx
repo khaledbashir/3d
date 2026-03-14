@@ -1,5 +1,4 @@
 import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
 import type { Mesh } from 'three'
 import { useLEDTexture } from '@/hooks/useLEDTexture'
 import { useVenueStore } from '@/stores/venueStore'
@@ -27,32 +26,44 @@ export function LEDScreen({ zone }: LEDScreenProps) {
 
   return (
     <group position={zone.position} rotation={zone.rotation}>
-      {/* Bezel / frame */}
-      <mesh position={[0, 0, -0.15]}>
-        <planeGeometry args={[zone.width + 1.5, zone.height + 1.5]} />
+      {/* Mounting bracket / frame */}
+      <mesh position={[0, 0, -0.3]}>
+        <boxGeometry args={[zone.width + 2, zone.height + 2, 0.5]} />
+        <meshStandardMaterial color="#0a0a10" metalness={0.95} roughness={0.15} />
+      </mesh>
+
+      {/* LED bezel */}
+      <mesh position={[0, 0, -0.08]}>
+        <boxGeometry args={[zone.width + 0.8, zone.height + 0.8, 0.15]} />
         <meshStandardMaterial color="#111118" metalness={0.9} roughness={0.2} />
       </mesh>
 
-      {/* Glow plane */}
-      <mesh position={[0, 0, -0.25]}>
-        <planeGeometry args={[zone.width + 6, zone.height + 6]} />
-        <meshBasicMaterial
-          color={isSelected ? '#0A52EF' : '#03B8FF'}
-          transparent
-          opacity={isSelected ? 0.08 : 0.025}
-        />
-      </mesh>
+      {/* Light spill on surrounding surfaces */}
+      <pointLight
+        position={[0, 0, 3]}
+        color={zone.enabled ? (sponsor.id !== 'none' ? sponsor.color : '#0A52EF') : '#000000'}
+        intensity={zone.enabled ? 0.4 : 0}
+        distance={zone.width * 1.5}
+        decay={2}
+      />
 
-      {/* LED Surface */}
+      {/* Selection highlight ring */}
+      {isSelected && (
+        <mesh position={[0, 0, -0.05]}>
+          <planeGeometry args={[zone.width + 3, zone.height + 3]} />
+          <meshBasicMaterial
+            color="#0A52EF"
+            transparent
+            opacity={0.15}
+          />
+        </mesh>
+      )}
+
+      {/* LED Surface — emissive for bloom pickup */}
       <mesh ref={meshRef} onClick={handleClick}>
         <planeGeometry args={[zone.width, zone.height]} />
-        <meshStandardMaterial
+        <meshBasicMaterial
           map={texture}
-          emissiveMap={texture}
-          emissive="#ffffff"
-          emissiveIntensity={zone.enabled ? 0.8 : 0.05}
-          roughness={0.2}
-          metalness={0.5}
           toneMapped={false}
         />
       </mesh>

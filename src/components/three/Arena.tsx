@@ -31,7 +31,7 @@ function ArenaBowl({ radiusX, radiusZ, height, yBase, color }: {
 
   return (
     <mesh geometry={geometry} rotation={[-Math.PI / 2, 0, 0]} position={[0, yBase, 0]} castShadow receiveShadow>
-      <meshStandardMaterial color={color} roughness={0.8} metalness={0.1} />
+      <meshStandardMaterial color={color} roughness={0.85} metalness={0.05} />
     </mesh>
   )
 }
@@ -39,49 +39,76 @@ function ArenaBowl({ radiusX, radiusZ, height, yBase, color }: {
 function CourtSurface() {
   const texture = useMemo(() => {
     const canvas = document.createElement('canvas')
-    canvas.width = 800; canvas.height = 480
+    canvas.width = 1600; canvas.height = 960
     const ctx = canvas.getContext('2d')!
 
-    // Court floor
+    // Hardwood floor base
     ctx.fillStyle = '#b8803a'
-    ctx.fillRect(0, 0, 800, 480)
+    ctx.fillRect(0, 0, 1600, 960)
 
-    // Darker wood grain lines
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)'
+    // Wood plank pattern
+    ctx.strokeStyle = 'rgba(100,60,20,0.12)'
     ctx.lineWidth = 1
-    for (let i = 0; i < 800; i += 12) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 480); ctx.stroke() }
+    for (let i = 0; i < 1600; i += 20) {
+      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 960); ctx.stroke()
+    }
+    // Horizontal plank joints
+    for (let j = 0; j < 960; j += 80) {
+      ctx.strokeStyle = 'rgba(80,50,15,0.08)'
+      ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(1600, j); ctx.stroke()
+    }
 
-    // Court lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 3
+    // Subtle wood grain variation
+    for (let i = 0; i < 80; i++) {
+      const x = Math.random() * 1600
+      const y = Math.random() * 960
+      ctx.fillStyle = `rgba(${100 + Math.random() * 30},${60 + Math.random() * 20},${15 + Math.random() * 10},0.04)`
+      ctx.fillRect(x, y, 20 + Math.random() * 40, 960)
+    }
+
+    // Paint areas
+    ctx.fillStyle = 'rgba(0,40,180,0.12)'
+    ctx.fillRect(60, 280, 300, 400)
+    ctx.fillRect(1240, 280, 300, 400)
+
+    // Court lines — white
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 4
 
     // Boundary
-    ctx.strokeRect(30, 30, 740, 420)
+    ctx.strokeRect(60, 60, 1480, 840)
 
     // Center line
-    ctx.beginPath(); ctx.moveTo(400, 30); ctx.lineTo(400, 450); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(800, 60); ctx.lineTo(800, 900); ctx.stroke()
 
     // Center circle
-    ctx.beginPath(); ctx.arc(400, 240, 50, 0, Math.PI * 2); ctx.stroke()
+    ctx.beginPath(); ctx.arc(800, 480, 100, 0, Math.PI * 2); ctx.stroke()
+    ctx.fillStyle = 'rgba(0,40,180,0.08)'
+    ctx.beginPath(); ctx.arc(800, 480, 100, 0, Math.PI * 2); ctx.fill()
 
-    // Free throw circles / 3pt arcs
-    ctx.beginPath(); ctx.arc(130, 240, 50, -Math.PI / 2, Math.PI / 2); ctx.stroke()
-    ctx.beginPath(); ctx.arc(670, 240, 50, Math.PI / 2, -Math.PI / 2); ctx.stroke()
+    // Free throw circles
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 3
+    ctx.beginPath(); ctx.arc(260, 480, 100, -Math.PI / 2, Math.PI / 2); ctx.stroke()
+    ctx.beginPath(); ctx.arc(1340, 480, 100, Math.PI / 2, -Math.PI / 2); ctx.stroke()
 
     // Paint
-    ctx.strokeRect(30, 140, 150, 200)
-    ctx.strokeRect(620, 140, 150, 200)
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth = 4
+    ctx.strokeRect(60, 280, 300, 400)
+    ctx.strokeRect(1240, 280, 300, 400)
 
     // 3-point arcs
-    ctx.beginPath(); ctx.arc(80, 240, 160, -1.2, 1.2); ctx.stroke()
-    ctx.beginPath(); ctx.arc(720, 240, 160, Math.PI - 1.2, Math.PI + 1.2); ctx.stroke()
+    ctx.strokeStyle = 'rgba(255,255,255,0.45)'; ctx.lineWidth = 3
+    ctx.beginPath(); ctx.arc(160, 480, 320, -1.2, 1.2); ctx.stroke()
+    ctx.beginPath(); ctx.arc(1440, 480, 320, Math.PI - 1.2, Math.PI + 1.2); ctx.stroke()
 
-    return new CanvasTexture(canvas)
+    const tex = new CanvasTexture(canvas)
+    tex.anisotropy = 16
+    return tex
   }, [])
 
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.1, 0]} receiveShadow>
       <planeGeometry args={[50, 30]} />
-      <meshStandardMaterial map={texture} roughness={0.6} />
+      <meshStandardMaterial map={texture} roughness={0.55} metalness={0.05} envMapIntensity={0.3} />
     </mesh>
   )
 }
@@ -100,7 +127,7 @@ function ArenaSeats() {
       {rows.map((row, i) => (
         <mesh key={i} rotation={[Math.PI / 2, 0, 0]} position={[0, row.y, 0]} scale={[1, 1, row.scaleZ]}>
           <torusGeometry args={[row.r, 0.2, 4, 48]} />
-          <meshStandardMaterial color={row.color} roughness={0.9} />
+          <meshStandardMaterial color={row.color} roughness={0.92} metalness={0.02} />
         </mesh>
       ))}
     </>
@@ -114,10 +141,19 @@ function ArenaLighting() {
     <>
       {positions.map((pos, i) => (
         <group key={i}>
-          <pointLight position={pos} color="#fff8f0" intensity={0.5} distance={200} />
+          <spotLight
+            position={pos}
+            target-position={[0, 0, 0]}
+            color="#fff8f0"
+            intensity={40}
+            distance={150}
+            angle={0.7}
+            penumbra={0.4}
+            decay={2}
+          />
           <mesh position={pos}>
-            <boxGeometry args={[8, 1, 3]} />
-            <meshStandardMaterial color="#fff5e0" emissive="#fff5e0" emissiveIntensity={0.4} />
+            <boxGeometry args={[8, 1.2, 3.5]} />
+            <meshStandardMaterial color="#fff5e0" emissive="#fff5e0" emissiveIntensity={1.5} toneMapped={false} />
           </mesh>
         </group>
       ))}
@@ -131,8 +167,8 @@ function ScoreboardCables() {
     <>
       {positions.map((pos, i) => (
         <mesh key={i} position={pos}>
-          <cylinderGeometry args={[0.1, 0.1, 12, 4]} />
-          <meshStandardMaterial color="#333344" metalness={0.8} />
+          <cylinderGeometry args={[0.12, 0.12, 12, 6]} />
+          <meshStandardMaterial color="#2a2a38" metalness={0.9} roughness={0.15} />
         </mesh>
       ))}
     </>
@@ -145,7 +181,7 @@ export function Arena() {
       {/* Ground */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
         <planeGeometry args={[400, 400]} />
-        <meshStandardMaterial color="#0a0e14" roughness={1} />
+        <meshStandardMaterial color="#08090e" roughness={0.98} />
       </mesh>
 
       {/* Bowl */}
@@ -158,7 +194,7 @@ export function Arena() {
       {/* Roof ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 28, 0]} scale={[1, 1, 0.72]}>
         <torusGeometry args={[55, 3, 6, 48]} />
-        <meshStandardMaterial color="#2a2a3a" metalness={0.7} roughness={0.3} />
+        <meshStandardMaterial color="#1e1e2a" metalness={0.85} roughness={0.2} envMapIntensity={0.5} />
       </mesh>
 
       <CourtSurface />
