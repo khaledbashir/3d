@@ -122,12 +122,21 @@ function VenueGeometry() {
 
 function CrowdForVenue() {
   const venueType = useVenueStore(s => s.venueType)
+  const crowdMode = useVenueStore(s => s.crowdMode)
+
+  if (crowdMode === 'empty') return null
 
   switch (venueType) {
     case 'nfl':
-      return <Crowd count={1000} radiusX={100} radiusZ={70} minY={3} maxY={38} scaleZ={0.7} />
+      return <Crowd density={crowdMode} sections={[
+        { rows: 10, seatsPerRow: 72, radiusX: 90, radiusZ: 62, startY: 5, rowRise: 1.75, scaleZ: 0.69 },
+        { rows: 10, seatsPerRow: 84, radiusX: 107, radiusZ: 74, startY: 24, rowRise: 1.95, scaleZ: 0.72 },
+      ]} />
     case 'nba':
-      return <Crowd count={500} radiusX={45} radiusZ={32} minY={2} maxY={24} scaleZ={0.68} />
+      return <Crowd density={crowdMode} sections={[
+        { rows: 8, seatsPerRow: 54, radiusX: 31, radiusZ: 22, startY: 3, rowRise: 1.5, scaleZ: 0.68 },
+        { rows: 8, seatsPerRow: 66, radiusX: 44, radiusZ: 31, startY: 15, rowRise: 1.7, scaleZ: 0.71 },
+      ]} />
     default:
       return null
   }

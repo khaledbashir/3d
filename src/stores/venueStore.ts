@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { VenueType, LEDZone, ContentType, CameraState, Sponsor } from '@/types'
+import type { VenueType, LEDZone, ContentType, CameraState, Sponsor, CrowdMode } from '@/types'
 import { venues, getVenue } from '@/data/venues'
 import { sponsors as defaultSponsors } from '@/data/sponsors'
 import { presets } from '@/data/presets'
@@ -30,6 +30,10 @@ interface VenueStore {
   // Simulation
   simulating: boolean
   toggleSimulation: () => void
+
+  // Attendance
+  crowdMode: CrowdMode
+  setCrowdMode: (mode: CrowdMode) => void
 
   // Presets
   applyPreset: (presetId: string) => void
@@ -94,6 +98,9 @@ export const useVenueStore = create<VenueStore>((set, get) => ({
 
   simulating: false,
   toggleSimulation: () => set(state => ({ simulating: !state.simulating })),
+
+  crowdMode: 'half',
+  setCrowdMode: (mode) => set({ crowdMode: mode }),
 
   applyPreset: (presetId) => {
     const preset = presets.find(p => p.id === presetId)

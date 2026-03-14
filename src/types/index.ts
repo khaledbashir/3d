@@ -2,6 +2,7 @@ export type VenueType = 'nfl' | 'nba' | 'mall' | 'transit'
 export type ContentType = 'logo' | 'ad' | 'score' | 'replay' | 'animation'
 export type ZoneType = 'videoboard' | 'ribbon' | 'fascia' | 'endzone' | 'stanchion' | 'courtside' | 'scoring' | 'totem' | 'wayfinding' | 'column'
 export type Environment = 'indoor' | 'outdoor' | 'both'
+export type CrowdMode = 'empty' | 'half' | 'full'
 
 export interface Product {
   id: string

@@ -1,5 +1,6 @@
 import { useVenueStore } from '@/stores/venueStore'
 import { VenueSwitcher } from './VenueSwitcher'
+import type { CrowdMode } from '@/types'
 
 interface HeaderProps {
   zonesOpen: boolean
@@ -19,6 +20,14 @@ export function Header({
   const resetCamera = useVenueStore(s => s.resetCamera)
   const zones = useVenueStore(s => s.zones)
   const activeCount = zones.filter(z => z.enabled).length
+  const crowdMode = useVenueStore(s => s.crowdMode)
+  const setCrowdMode = useVenueStore(s => s.setCrowdMode)
+
+  const crowdOptions: { id: CrowdMode; label: string }[] = [
+    { id: 'empty', label: 'Empty' },
+    { id: 'half', label: 'Half Full' },
+    { id: 'full', label: 'Packed' },
+  ]
 
   return (
     <div className="absolute top-0 left-0 right-0 z-20 px-4 pt-3">
@@ -37,6 +46,18 @@ export function Header({
 
         <div className="flex items-center gap-2 overflow-x-auto">
           <VenueSwitcher />
+
+          <div className="flex items-center gap-1 rounded-full border px-1 py-1 anc-chip-strip">
+            {crowdOptions.map(option => (
+              <button
+                key={option.id}
+                onClick={() => setCrowdMode(option.id)}
+                className={`anc-toolbar-button ${crowdMode === option.id ? 'anc-toolbar-button--active' : ''}`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
 
           <button onClick={onToggleZones} className={`anc-toolbar-button ${zonesOpen ? 'anc-toolbar-button--active' : ''}`}>
             {zonesOpen ? 'Hide Zone List' : 'Show Zone List'}
