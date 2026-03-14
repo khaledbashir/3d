@@ -5,19 +5,40 @@ import { Header } from '@/components/ui/Header'
 import { ZonePanel } from '@/components/ui/ZonePanel'
 import { RevenuePanel } from '@/components/ui/RevenuePanel'
 import { DetailPanel } from '@/components/ui/DetailPanel'
+import { RoiPanel } from '@/components/ui/RoiPanel'
+import { SetupWizard } from '@/components/ui/SetupWizard'
+import { ExportSheet } from '@/components/ui/ExportSheet'
 import { useVenueStore } from '@/stores/venueStore'
+import { decodeConfigFromUrl } from '@/utils/configUrl'
 
 export default function App() {
   const selectedZoneId = useVenueStore(s => s.selectedZoneId)
+  const hydrateFromSnapshot = useVenueStore(s => s.hydrateFromSnapshot)
   const [zonesOpen, setZonesOpen] = useState(true)
   const [insightsOpen, setInsightsOpen] = useState(true)
   const [detailOpen, setDetailOpen] = useState(true)
+  const [roiOpen, setRoiOpen] = useState(false)
+  const [wizardOpen, setWizardOpen] = useState(() => !localStorage.getItem('anc-wizard-seen'))
+
+  // Hydrate from URL hash on mount
+  useEffect(() => {
+    const snapshot = decodeConfigFromUrl()
+    if (snapshot) {
+      hydrateFromSnapshot(snapshot)
+      window.history.replaceState(null, '', window.location.pathname)
+    }
+  }, [hydrateFromSnapshot])
 
   useEffect(() => {
     if (selectedZoneId) {
       setDetailOpen(true)
     }
   }, [selectedZoneId])
+
+  const handleCloseWizard = () => {
+    setWizardOpen(false)
+    localStorage.setItem('anc-wizard-seen', '1')
+  }
 
   return (
     <div className="w-screen h-screen overflow-hidden anc-app-shell">
@@ -32,7 +53,7 @@ export default function App() {
           shadows
           dpr={[1, 2]}
           onCreated={({ gl }) => {
-            gl.setClearColor('#080c12')
+            gl.setClearColor('#000a1a')
           }}
         >
           <VenueScene />
@@ -43,17 +64,24 @@ export default function App() {
         <Header
           zonesOpen={zonesOpen}
           insightsOpen={insightsOpen}
+          roiOpen={roiOpen}
           onToggleZones={() => setZonesOpen(open => !open)}
-          onToggleInsights={() => setInsightsOpen(open => !open)}
+          onToggleInsights={() => { setInsightsOpen(open => !open); if (!insightsOpen) setRoiOpen(false) }}
+          onToggleRoi={() => { setRoiOpen(open => !open); if (!roiOpen) setInsightsOpen(false) }}
+          onOpenWizard={() => setWizardOpen(true)}
         />
         <ZonePanel open={zonesOpen} />
-        <RevenuePanel open={insightsOpen} />
+        <RevenuePanel open={insightsOpen && !roiOpen} />
+        <RoiPanel open={roiOpen} />
         <DetailPanel open={detailOpen} onClose={() => setDetailOpen(false)} />
 
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] opacity-70 text-center pointer-events-none anc-help-chip">
           Click & drag to orbit · Scroll to zoom · Click LED zones to configure
         </div>
       </div>
+
+      <SetupWizard open={wizardOpen} onClose={handleCloseWizard} />
+      <ExportSheet />
     </div>
   )
 }

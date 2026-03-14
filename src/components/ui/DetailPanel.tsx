@@ -1,14 +1,17 @@
+import { useState } from 'react'
 import { useVenueStore } from '@/stores/venueStore'
 import { products } from '@/data/products'
 import { LogoUpload } from './LogoUpload'
+import { ProductBrowser } from './ProductBrowser'
+import { calculateCabinetLayout } from '@/utils/cabinetLayout'
 import type { ContentType } from '@/types'
 
 const contentOptions: { value: ContentType; label: string }[] = [
-  { value: 'logo', label: '🏷️ Sponsor Logo' },
-  { value: 'ad', label: '📺 Advertisement' },
-  { value: 'score', label: '🏈 Live Score' },
-  { value: 'replay', label: '🔄 Instant Replay' },
-  { value: 'animation', label: '✨ Animation' },
+  { value: 'logo', label: 'Sponsor Logo' },
+  { value: 'ad', label: 'Advertisement' },
+  { value: 'score', label: 'Live Score' },
+  { value: 'replay', label: 'Instant Replay' },
+  { value: 'animation', label: 'Animation' },
 ]
 
 interface DetailPanelProps {
@@ -25,6 +28,7 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
   const setZoneContent = useVenueStore(s => s.setZoneContent)
   const setZoneProduct = useVenueStore(s => s.setZoneProduct)
   const venueType = useVenueStore(s => s.venueType)
+  const [browserOpen, setBrowserOpen] = useState(false)
 
   if (!open) return null
 
@@ -66,8 +70,8 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
   }
 
   const envFilter = venueType === 'nfl' ? 'outdoor' : 'indoor'
-  const filteredProducts = products.filter(p => p.environment === envFilter || p.environment === 'both')
   const currentProduct = products.find(p => p.id === zone.product)
+  const cabinet = currentProduct ? calculateCabinetLayout(zone.width, zone.height, currentProduct) : null
 
   return (
     <div className="absolute bottom-4 rounded-[24px] p-4 anc-detail-panel" style={{ left: '320px', right: '320px' }}>
@@ -77,9 +81,6 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
             Zone Editor
           </div>
           <div className="text-lg tracking-wide truncate" style={{ fontFamily: "'Work Sans', sans-serif" }}>{zone.name}</div>
-          <div className="text-[11px] mt-1 max-w-[560px]" style={{ color: '#6f88a0' }}>
-            Adjust the sponsor, content type, and LED product for this placement.
-          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -114,18 +115,25 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
 
         <div className="anc-field-card">
           <label className="block text-[9px] uppercase tracking-[1.5px] mb-1" style={{ color: '#5a7a9a' }}>Product</label>
-          <select value={zone.product} onChange={e => setZoneProduct(zone.id, e.target.value)} style={selectStyle}>
-            {filteredProducts.map(p => (
-              <option key={p.id} value={p.id}>
-                {p.manufacturer} {p.series}
-              </option>
-            ))}
-          </select>
+          <button
+            onClick={() => setBrowserOpen(true)}
+            className="w-full h-[42px] rounded-xl px-3 text-left text-[12px] text-white cursor-pointer transition-all"
+            style={{ background: 'rgba(8,14,22,0.92)', border: '1px solid rgba(255,255,255,0.06)' }}
+          >
+            {currentProduct ? `${currentProduct.manufacturer} ${currentProduct.series}` : 'Select product...'}
+          </button>
           {currentProduct && (
             <div className="text-[8px] mt-1" style={{ color: '#3a5a7a', fontFamily: 'monospace' }}>
               {currentProduct.sku} · {currentProduct.pixelPitch}mm · {currentProduct.nits.toLocaleString()} nits
             </div>
           )}
+          <ProductBrowser
+            open={browserOpen}
+            onClose={() => setBrowserOpen(false)}
+            onSelect={id => setZoneProduct(zone.id, id)}
+            currentProductId={zone.product}
+            venueEnvironment={envFilter}
+          />
         </div>
 
         <div className="anc-field-card">
@@ -141,14 +149,22 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
         </div>
 
         <div className="anc-field-card">
-          <label className="block text-[9px] uppercase tracking-[1.5px] mb-1" style={{ color: '#5a7a9a' }}>Dimensions</label>
+          <label className="block text-[9px] uppercase tracking-[1.5px] mb-1" style={{ color: '#5a7a9a' }}>Specs</label>
           <div className="rounded-2xl p-3" style={{ background: 'rgba(8, 14, 22, 0.92)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="text-xs font-semibold" style={{ color: '#03B8FF' }}>
-              {zone.width} × {zone.height}
+              {zone.width} × {zone.height} ft
             </div>
-            <div className="text-[9px]" style={{ color: '#5a7a9a' }}>
-              {zone.panelCount} panels
-            </div>
+            {cabinet ? (
+              <div className="text-[8px] mt-1 flex flex-col gap-0.5" style={{ color: '#6888a8' }}>
+                <span>{cabinet.cols}×{cabinet.rows} grid · {cabinet.totalCabinets} cabinets</span>
+                <span>{cabinet.resolutionW}×{cabinet.resolutionH}px</span>
+                <span>{cabinet.totalWeightLbs.toLocaleString()} lbs · {(cabinet.totalPowerW / 1000).toFixed(1)} kW</span>
+              </div>
+            ) : (
+              <div className="text-[9px]" style={{ color: '#5a7a9a' }}>
+                {zone.panelCount} panels
+              </div>
+            )}
           </div>
         </div>
       </div>

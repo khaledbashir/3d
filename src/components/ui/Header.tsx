@@ -1,19 +1,28 @@
+import { useState } from 'react'
 import { useVenueStore } from '@/stores/venueStore'
 import { VenueSwitcher } from './VenueSwitcher'
+import { SaveLoadModal } from './SaveLoadModal'
+import { encodeConfigToUrl } from '@/utils/configUrl'
 import type { CrowdMode } from '@/types'
 
 interface HeaderProps {
   zonesOpen: boolean
   insightsOpen: boolean
+  roiOpen: boolean
   onToggleZones: () => void
   onToggleInsights: () => void
+  onToggleRoi: () => void
+  onOpenWizard: () => void
 }
 
 export function Header({
   zonesOpen,
   insightsOpen,
+  roiOpen,
   onToggleZones,
   onToggleInsights,
+  onToggleRoi,
+  onOpenWizard,
 }: HeaderProps) {
   const simulating = useVenueStore(s => s.simulating)
   const toggleSimulation = useVenueStore(s => s.toggleSimulation)
@@ -22,12 +31,27 @@ export function Header({
   const activeCount = zones.filter(z => z.enabled).length
   const crowdMode = useVenueStore(s => s.crowdMode)
   const setCrowdMode = useVenueStore(s => s.setCrowdMode)
+  const [saveLoadOpen, setSaveLoadOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const venueType = useVenueStore(s => s.venueType)
+  const sponsors = useVenueStore(s => s.sponsors)
 
   const crowdOptions: { id: CrowdMode; label: string }[] = [
     { id: 'empty', label: 'Empty' },
     { id: 'half', label: 'Half Full' },
     { id: 'full', label: 'Packed' },
   ]
+
+  const handleShare = () => {
+    const url = encodeConfigToUrl({ venueType, zones, sponsors })
+    navigator.clipboard.writeText(url).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  const handleExport = () => window.print()
 
   return (
     <div className="absolute top-0 left-0 right-0 z-20 px-4 pt-3">
@@ -39,7 +63,7 @@ export function Header({
               ANC VENUE VISION
             </h1>
             <p className="text-[9px] uppercase" style={{ color: '#6888a8', fontFamily: "'Work Sans', sans-serif", letterSpacing: '0.1em' }}>
-              Pick a venue, turn zones on, then click a zone to edit it
+              3D LED Configurator
             </p>
           </div>
         </div>
@@ -60,32 +84,50 @@ export function Header({
           </div>
 
           <button onClick={onToggleZones} className={`anc-toolbar-button ${zonesOpen ? 'anc-toolbar-button--active' : ''}`}>
-            {zonesOpen ? 'Hide Zone List' : 'Show Zone List'}
+            Zones
           </button>
 
           <button onClick={onToggleInsights} className={`anc-toolbar-button ${insightsOpen ? 'anc-toolbar-button--active' : ''}`}>
-            {insightsOpen ? 'Hide Revenue' : 'Show Revenue'}
+            Revenue
+          </button>
+
+          <button onClick={onToggleRoi} className={`anc-toolbar-button ${roiOpen ? 'anc-toolbar-button--active' : ''}`}>
+            ROI
           </button>
 
           <button onClick={toggleSimulation} className={`anc-toolbar-button ${simulating ? 'anc-toolbar-button--accent' : ''}`}>
-            {simulating ? 'Stop Auto Demo' : 'Start Auto Demo'}
+            {simulating ? 'Stop Demo' : 'Auto Demo'}
           </button>
 
           <button onClick={resetCamera} className="anc-toolbar-button">
             Reset View
           </button>
 
-          <span className="anc-status-pill">
-            {activeCount}/{zones.length} Active
-          </span>
+          <span className="w-px h-5 self-center" style={{ background: 'rgba(255,255,255,0.1)' }} />
 
-          {simulating && (
-            <span className="anc-status-pill">
-              Auto demo is cycling screen content
-            </span>
-          )}
+          <button onClick={() => setSaveLoadOpen(true)} className="anc-toolbar-button">
+            Save/Load
+          </button>
+
+          <button onClick={handleExport} className="anc-toolbar-button">
+            Export
+          </button>
+
+          <button onClick={handleShare} className={`anc-toolbar-button ${copied ? 'anc-toolbar-button--active' : ''}`}>
+            {copied ? 'Copied!' : 'Share'}
+          </button>
+
+          <button onClick={onOpenWizard} className="anc-toolbar-button">
+            Guide
+          </button>
+
+          <span className="anc-status-pill">
+            {activeCount}/{zones.length}
+          </span>
         </div>
       </div>
+
+      <SaveLoadModal open={saveLoadOpen} onClose={() => setSaveLoadOpen(false)} />
     </div>
   )
 }

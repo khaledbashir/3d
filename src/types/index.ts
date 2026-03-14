@@ -57,3 +57,25 @@ export interface CameraState {
   pitch: number
   distance: number
 }
+
+export interface SavedConfig {
+  id: string
+  name: string
+  venueType: VenueType
+  zones: LEDZone[]
+  sponsors: Sponsor[]
+  timestamp: number
+}
+
+export interface CabinetLayout {
+  cols: number
+  rows: number
+  totalCabinets: number
+  actualWidthFt: number
+  actualHeightFt: number
+  totalWeightLbs: number
+  totalPowerW: number
+  heatLoadBtu: number
+  resolutionW: number
+  resolutionH: number
+}

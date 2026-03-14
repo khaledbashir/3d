@@ -234,3 +234,9 @@ canvas {
     grid-template-columns: 1fr;
   }
 }
+
+@media print {
+  body { background: #fff !important; overflow: visible !important; height: auto !important; }
+  .anc-app-shell > *:not(.anc-print-sheet) { display: none !important; }
+  .anc-print-sheet { display: block !important; }
+}
