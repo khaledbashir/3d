@@ -1,5 +1,5 @@
 import { useVenueStore } from '@/stores/venueStore'
-import { products, getProductsByEnvironment } from '@/data/products'
+import { products } from '@/data/products'
 import { LogoUpload } from './LogoUpload'
 import type { ContentType } from '@/types'
 
@@ -11,7 +11,12 @@ const contentOptions: { value: ContentType; label: string }[] = [
   { value: 'animation', label: '✨ Animation' },
 ]
 
-export function DetailPanel() {
+interface DetailPanelProps {
+  open: boolean
+  onClose: () => void
+}
+
+export function DetailPanel({ open, onClose }: DetailPanelProps) {
   const selectedZoneId = useVenueStore(s => s.selectedZoneId)
   const zones = useVenueStore(s => s.zones)
   const sponsors = useVenueStore(s => s.sponsors)
@@ -21,7 +26,7 @@ export function DetailPanel() {
   const setZoneProduct = useVenueStore(s => s.setZoneProduct)
   const venueType = useVenueStore(s => s.venueType)
 
-  if (!selectedZoneId) return null
+  if (!selectedZoneId || !open) return null
 
   const zone = zones.find(z => z.id === selectedZoneId)
   if (!zone) return null
@@ -31,69 +36,61 @@ export function DetailPanel() {
   const currentProduct = products.find(p => p.id === zone.product)
 
   const selectStyle: React.CSSProperties = {
-    width: '100%', height: '30px', background: '#0a1018', border: '1px solid #1a2a3a',
-    borderRadius: '4px', color: '#fff', fontSize: '11px', padding: '0 8px', outline: 'none',
+    width: '100%',
+    height: '42px',
+    background: 'rgba(8, 14, 22, 0.92)',
+    border: '1px solid rgba(255,255,255,0.06)',
+    borderRadius: '14px',
+    color: '#fff',
+    fontSize: '12px',
+    padding: '0 12px',
+    outline: 'none',
   }
 
   return (
-    <div className="absolute bottom-2.5 rounded-lg p-3.5"
-      style={{
-        left: '260px', right: '280px',
-        background: 'rgba(13,21,32,0.95)', backdropFilter: 'blur(12px)',
-        border: '1px solid #1a2a3a',
-      }}>
-
-      {/* Header */}
-      <div className="flex justify-between items-start mb-3">
-        <div>
-          <div className="text-sm tracking-wide" style={{ fontFamily: 'Oswald, sans-serif' }}>{zone.name}</div>
-          <div className="text-[10px] mt-0.5" style={{ color: '#5a7a9a' }}>{zone.description}</div>
+    <div className="absolute bottom-4 rounded-[24px] p-4 anc-detail-panel" style={{ left: '320px', right: '320px' }}>
+      <div className="flex justify-between items-start gap-4 mb-4">
+        <div className="min-w-0">
+          <div className="text-[10px] uppercase tracking-[2px] mb-1" style={{ fontFamily: 'Oswald, sans-serif', color: '#5a7a9a' }}>
+            Zone Editor
+          </div>
+          <div className="text-lg tracking-wide truncate" style={{ fontFamily: 'Oswald, sans-serif' }}>{zone.name}</div>
+          <div className="text-[11px] mt-1 max-w-[560px]" style={{ color: '#6f88a0' }}>{zone.description}</div>
         </div>
-        <div
-          onClick={() => toggleZone(zone.id)}
-          className="relative w-9 h-5 rounded-full cursor-pointer transition-colors"
-          style={{ background: zone.enabled ? '#00ff88' : '#1a2a3a' }}
-        >
-          <div className="absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform"
-            style={{ left: '2px', transform: zone.enabled ? 'translateX(16px)' : 'translateX(0)' }} />
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => toggleZone(zone.id)}
+            className={`anc-mini-switch ${zone.enabled ? 'anc-mini-switch--on' : ''}`}
+            aria-label={`${zone.enabled ? 'Disable' : 'Enable'} ${zone.name}`}
+          >
+            <span />
+          </button>
+          <button onClick={onClose} className="anc-toolbar-button">
+            Close
+          </button>
         </div>
       </div>
 
-      {/* Fields grid */}
-      <div className="grid gap-2.5" style={{ gridTemplateColumns: '1.2fr 1fr 1fr 0.8fr 0.8fr' }}>
-        {/* Sponsor */}
-        <div>
+      <div className="grid gap-3 anc-detail-grid">
+        <div className="anc-field-card">
           <label className="block text-[9px] uppercase tracking-[1.5px] mb-1" style={{ color: '#5a7a9a' }}>Sponsor</label>
-          <select
-            value={zone.sponsor}
-            onChange={e => setZoneSponsor(zone.id, e.target.value)}
-            style={selectStyle}
-          >
+          <select value={zone.sponsor} onChange={e => setZoneSponsor(zone.id, e.target.value)} style={selectStyle}>
             {sponsors.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
           <LogoUpload sponsorId={zone.sponsor} />
         </div>
 
-        {/* Content */}
-        <div>
+        <div className="anc-field-card">
           <label className="block text-[9px] uppercase tracking-[1.5px] mb-1" style={{ color: '#5a7a9a' }}>Content</label>
-          <select
-            value={zone.content}
-            onChange={e => setZoneContent(zone.id, e.target.value as ContentType)}
-            style={selectStyle}
-          >
+          <select value={zone.content} onChange={e => setZoneContent(zone.id, e.target.value as ContentType)} style={selectStyle}>
             {contentOptions.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>
         </div>
 
-        {/* Product */}
-        <div>
+        <div className="anc-field-card">
           <label className="block text-[9px] uppercase tracking-[1.5px] mb-1" style={{ color: '#5a7a9a' }}>Product</label>
-          <select
-            value={zone.product}
-            onChange={e => setZoneProduct(zone.id, e.target.value)}
-            style={selectStyle}
-          >
+          <select value={zone.product} onChange={e => setZoneProduct(zone.id, e.target.value)} style={selectStyle}>
             {filteredProducts.map(p => (
               <option key={p.id} value={p.id}>
                 {p.manufacturer} {p.series}
@@ -107,10 +104,9 @@ export function DetailPanel() {
           )}
         </div>
 
-        {/* Pricing */}
-        <div>
+        <div className="anc-field-card">
           <label className="block text-[9px] uppercase tracking-[1.5px] mb-1" style={{ color: '#5a7a9a' }}>Pricing</label>
-          <div className="rounded p-1.5" style={{ background: '#0a1018', border: '1px solid #1a2a3a' }}>
+          <div className="rounded-2xl p-3" style={{ background: 'rgba(8, 14, 22, 0.92)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="text-xs font-semibold" style={{ color: '#00ff88' }}>
               ${zone.pricePerGame.toLocaleString()}/game
             </div>
@@ -120,10 +116,9 @@ export function DetailPanel() {
           </div>
         </div>
 
-        {/* Dimensions */}
-        <div>
+        <div className="anc-field-card">
           <label className="block text-[9px] uppercase tracking-[1.5px] mb-1" style={{ color: '#5a7a9a' }}>Dimensions</label>
-          <div className="rounded p-1.5" style={{ background: '#0a1018', border: '1px solid #1a2a3a' }}>
+          <div className="rounded-2xl p-3" style={{ background: 'rgba(8, 14, 22, 0.92)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="text-xs font-semibold" style={{ color: '#00ccff' }}>
               {zone.width} × {zone.height}
             </div>

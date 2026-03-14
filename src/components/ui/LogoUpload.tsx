@@ -38,7 +38,7 @@ export function LogoUpload({ sponsorId }: LogoUploadProps) {
   if (!sponsor || sponsor.id === 'none') return null
 
   return (
-    <div className="mt-1">
+    <div className="mt-2">
       <div
         onDrop={onDrop}
         onDragOver={onDragOver}
@@ -46,9 +46,10 @@ export function LogoUpload({ sponsorId }: LogoUploadProps) {
         onClick={() => inputRef.current?.click()}
         className="rounded border border-dashed cursor-pointer transition-all flex items-center justify-center"
         style={{
-          height: '36px',
-          borderColor: dragging ? '#00ff88' : '#1a2a3a',
-          background: dragging ? 'rgba(0,255,136,0.06)' : '#0a1018',
+          height: '44px',
+          borderRadius: '14px',
+          borderColor: dragging ? '#00ff88' : 'rgba(255,255,255,0.08)',
+          background: dragging ? 'rgba(0,255,136,0.06)' : 'rgba(8, 14, 22, 0.92)',
         }}
       >
         {sponsor.logoUrl ? (

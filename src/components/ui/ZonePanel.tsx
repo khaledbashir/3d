@@ -1,67 +1,107 @@
 import { useVenueStore } from '@/stores/venueStore'
 import { presets } from '@/data/presets'
 
-export function ZonePanel() {
+interface ZonePanelProps {
+  open: boolean
+}
+
+export function ZonePanel({ open }: ZonePanelProps) {
   const zones = useVenueStore(s => s.zones)
   const selectedZoneId = useVenueStore(s => s.selectedZoneId)
   const selectZone = useVenueStore(s => s.selectZone)
   const applyPreset = useVenueStore(s => s.applyPreset)
+  const setZoneEnabled = useVenueStore(s => s.setZoneEnabled)
+  const activeCount = zones.filter(zone => zone.enabled).length
+
+  if (!open) return null
 
   return (
-    <div className="absolute left-2.5 flex flex-col gap-2 pb-2.5 overflow-y-auto"
-      style={{ top: '58px', width: '240px', maxHeight: 'calc(100vh - 68px)' }}>
+    <div className="absolute left-4 flex flex-col gap-3 pb-3 overflow-y-auto"
+      style={{ top: '84px', width: '286px', maxHeight: 'calc(100vh - 160px)' }}>
 
-      {/* Zone List */}
-      <div className="rounded-lg p-3" style={{ background: 'rgba(13,21,32,0.92)', backdropFilter: 'blur(12px)', border: '1px solid #1a2a3a' }}>
-        <div className="text-[10px] uppercase tracking-[2px] mb-2" style={{ fontFamily: 'Oswald, sans-serif', color: '#5a7a9a' }}>
-          LED Zones
+      <div className="anc-panel rounded-2xl p-4">
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <div>
+            <div className="text-[10px] uppercase tracking-[2px] mb-1" style={{ fontFamily: 'Oswald, sans-serif', color: '#5a7a9a' }}>
+              LED Zones
+            </div>
+            <div className="text-sm font-semibold text-white">{activeCount} active placements</div>
+          </div>
+          <div className="text-right">
+            <div className="text-[10px]" style={{ color: '#5a7a9a' }}>Coverage</div>
+            <div className="text-lg font-semibold" style={{ color: '#dfffee', fontFamily: 'Oswald, sans-serif' }}>
+              {Math.round((activeCount / Math.max(zones.length, 1)) * 100)}%
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col gap-0.5">
+
+        <div className="flex flex-col gap-2">
           {zones.map(zone => (
-            <button
+            <div
               key={zone.id}
-              onClick={() => selectZone(selectedZoneId === zone.id ? null : zone.id)}
-              className="w-full text-left flex items-center justify-between px-2.5 py-2 rounded-md border transition-all cursor-pointer text-[11px]"
+              className="rounded-2xl border p-3 transition-all"
               style={{
-                background: selectedZoneId === zone.id ? 'rgba(0,255,136,0.08)' : '#0a1018',
-                borderColor: selectedZoneId === zone.id ? 'rgba(0,255,136,0.3)' : 'transparent',
-                color: selectedZoneId === zone.id ? '#00ff88' : '#8aa0b8',
+                background: selectedZoneId === zone.id ? 'rgba(9, 18, 29, 0.98)' : 'rgba(8, 14, 22, 0.88)',
+                borderColor: selectedZoneId === zone.id ? 'rgba(0,255,136,0.22)' : 'rgba(255,255,255,0.05)',
+                boxShadow: selectedZoneId === zone.id ? '0 0 0 1px rgba(0,255,136,0.06) inset' : 'none',
               }}
             >
-              <span className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{ background: zone.enabled ? '#00ff88' : '#333' }} />
-                <span className="truncate max-w-[130px]">{zone.name}</span>
-              </span>
-              <span className="text-[8px] px-1.5 py-0.5 rounded border uppercase"
-                style={{
-                  fontFamily: 'Oswald, sans-serif',
-                  borderColor: zone.enabled ? 'rgba(0,255,136,0.2)' : '#333',
-                  color: zone.enabled ? '#00ff88' : '#555',
-                }}>
-                {zone.type}
-              </span>
-            </button>
+              <div className="flex items-start justify-between gap-2">
+                <button
+                  onClick={() => selectZone(selectedZoneId === zone.id ? null : zone.id)}
+                  className="min-w-0 flex-1 text-left cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0"
+                      style={{ background: zone.enabled ? '#00ff88' : '#314454' }} />
+                    <span className="truncate text-[12px] font-medium" style={{ color: '#f4fbff' }}>{zone.name}</span>
+                  </div>
+                  <div className="mt-1 text-[10px] leading-4" style={{ color: '#6f88a0' }}>
+                    {zone.description}
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setZoneEnabled(zone.id, !zone.enabled)}
+                  className={`anc-mini-switch ${zone.enabled ? 'anc-mini-switch--on' : ''}`}
+                  aria-label={`${zone.enabled ? 'Disable' : 'Enable'} ${zone.name}`}
+                >
+                  <span />
+                </button>
+              </div>
+
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <span className="text-[8px] px-2 py-1 rounded-full border uppercase"
+                  style={{
+                    fontFamily: 'Oswald, sans-serif',
+                    letterSpacing: '1px',
+                    borderColor: zone.enabled ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.08)',
+                    color: zone.enabled ? '#9effcd' : '#6b7d90',
+                  }}>
+                  {zone.type}
+                </span>
+                <span className="text-[10px]" style={{ color: '#7d93ab' }}>
+                  ${zone.pricePerGame.toLocaleString()}/game
+                </span>
+              </div>
+            </div>
           ))}
         </div>
       </div>
 
-      {/* Presets */}
-      <div className="rounded-lg p-3" style={{ background: 'rgba(13,21,32,0.92)', backdropFilter: 'blur(12px)', border: '1px solid #1a2a3a' }}>
-        <div className="text-[10px] uppercase tracking-[2px] mb-2" style={{ fontFamily: 'Oswald, sans-serif', color: '#5a7a9a' }}>
+      <div className="anc-panel rounded-2xl p-4">
+        <div className="text-[10px] uppercase tracking-[2px] mb-3" style={{ fontFamily: 'Oswald, sans-serif', color: '#5a7a9a' }}>
           Presets
         </div>
-        <div className="flex flex-col gap-0.5">
+        <div className="grid grid-cols-2 gap-2">
           {presets.map(preset => (
             <button
               key={preset.id}
               onClick={() => applyPreset(preset.id)}
-              className="w-full text-left px-2.5 py-1.5 rounded border text-[10px] transition-all cursor-pointer"
-              style={{ background: 'transparent', borderColor: '#1a2a3a', color: '#8aa0b8' }}
-              onMouseEnter={e => { (e.target as HTMLElement).style.background = '#1a2a3a'; (e.target as HTMLElement).style.color = '#fff' }}
-              onMouseLeave={e => { (e.target as HTMLElement).style.background = 'transparent'; (e.target as HTMLElement).style.color = '#8aa0b8' }}
+              className="w-full text-left px-3 py-2.5 rounded-2xl border text-[11px] transition-all cursor-pointer anc-preset-button"
             >
-              {preset.icon} {preset.name}
+              <div className="text-[13px] mb-1">{preset.icon}</div>
+              <div>{preset.name}</div>
             </button>
           ))}
         </div>
