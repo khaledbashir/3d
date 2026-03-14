@@ -26,10 +26,10 @@ export function Header({
         <div className="flex min-w-0 items-center gap-3">
           <img src="/anc-logo-white.png" alt="ANC" className="h-8 object-contain" />
           <div className="min-w-0">
-            <h1 className="text-sm font-semibold tracking-wider" style={{ fontFamily: 'Oswald, sans-serif', fontSize: '15px' }}>
+            <h1 className="text-sm font-bold uppercase" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: '15px', letterSpacing: '-0.045em' }}>
               ANC VENUE VISION
             </h1>
-            <p className="text-[9px] uppercase tracking-[2px]" style={{ color: '#5a7a9a' }}>
+            <p className="text-[9px] uppercase" style={{ color: '#6888a8', fontFamily: "'Work Sans', sans-serif", letterSpacing: '0.1em' }}>
               Pick a venue, turn zones on, then click a zone to edit it
             </p>
           </div>

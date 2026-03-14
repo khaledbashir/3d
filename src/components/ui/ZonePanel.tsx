@@ -21,7 +21,7 @@ export function ZonePanel({ open }: ZonePanelProps) {
 
       <div className="anc-panel rounded-2xl p-4">
         <div className="rounded-2xl px-3 py-3 mb-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <div className="text-[10px] uppercase tracking-[2px] mb-2" style={{ fontFamily: 'Oswald, sans-serif', color: '#5a7a9a' }}>
+          <div className="text-[10px] uppercase tracking-[2px] mb-2" style={{ fontFamily: "'Work Sans', sans-serif", color: '#5a7a9a' }}>
             How To Demo This
           </div>
           <div className="text-[11px] leading-5" style={{ color: '#c9d9e7' }}>
@@ -37,14 +37,14 @@ export function ZonePanel({ open }: ZonePanelProps) {
 
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <div className="text-[10px] uppercase tracking-[2px] mb-1" style={{ fontFamily: 'Oswald, sans-serif', color: '#5a7a9a' }}>
+            <div className="text-[10px] uppercase tracking-[2px] mb-1" style={{ fontFamily: "'Work Sans', sans-serif", color: '#5a7a9a' }}>
               LED Zones
             </div>
             <div className="text-sm font-semibold text-white">{activeCount} active placements</div>
           </div>
           <div className="text-right">
             <div className="text-[10px]" style={{ color: '#5a7a9a' }}>Coverage</div>
-            <div className="text-lg font-semibold" style={{ color: '#dfffee', fontFamily: 'Oswald, sans-serif' }}>
+            <div className="text-lg font-semibold" style={{ color: '#d0e4ff', fontFamily: "'Work Sans', sans-serif" }}>
               {Math.round((activeCount / Math.max(zones.length, 1)) * 100)}%
             </div>
           </div>
@@ -68,7 +68,7 @@ export function ZonePanel({ open }: ZonePanelProps) {
                 >
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full flex-shrink-0"
-                      style={{ background: zone.enabled ? '#00ff88' : '#314454' }} />
+                      style={{ background: zone.enabled ? '#0A52EF' : '#314454' }} />
                     <span className="truncate text-[12px] font-medium" style={{ color: '#f4fbff' }}>{zone.name}</span>
                   </div>
                   <div className="mt-1 text-[10px] leading-4" style={{ color: '#6f88a0' }}>
@@ -88,10 +88,10 @@ export function ZonePanel({ open }: ZonePanelProps) {
               <div className="mt-3 flex items-center justify-between gap-2">
                 <span className="text-[8px] px-2 py-1 rounded-full border uppercase"
                   style={{
-                    fontFamily: 'Oswald, sans-serif',
+                    fontFamily: "'Work Sans', sans-serif",
                     letterSpacing: '1px',
                     borderColor: zone.enabled ? 'rgba(0,255,136,0.2)' : 'rgba(255,255,255,0.08)',
-                    color: zone.enabled ? '#9effcd' : '#6b7d90',
+                    color: zone.enabled ? '#7db8ff' : '#6b7d90',
                   }}>
                   {zone.type}
                 </span>
@@ -105,7 +105,7 @@ export function ZonePanel({ open }: ZonePanelProps) {
       </div>
 
       <div className="anc-panel rounded-2xl p-4">
-        <div className="text-[10px] uppercase tracking-[2px] mb-3" style={{ fontFamily: 'Oswald, sans-serif', color: '#5a7a9a' }}>
+        <div className="text-[10px] uppercase tracking-[2px] mb-3" style={{ fontFamily: "'Work Sans', sans-serif", color: '#5a7a9a' }}>
           Presets
         </div>
         <div className="grid grid-cols-2 gap-2">

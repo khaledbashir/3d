@@ -48,8 +48,8 @@ export function LogoUpload({ sponsorId }: LogoUploadProps) {
         style={{
           height: '44px',
           borderRadius: '14px',
-          borderColor: dragging ? '#00ff88' : 'rgba(255,255,255,0.08)',
-          background: dragging ? 'rgba(0,255,136,0.06)' : 'rgba(8, 14, 22, 0.92)',
+          borderColor: dragging ? '#0A52EF' : 'rgba(255,255,255,0.08)',
+          background: dragging ? 'rgba(10,82,239,0.06)' : 'rgba(8, 14, 22, 0.92)',
         }}
       >
         {sponsor.logoUrl ? (

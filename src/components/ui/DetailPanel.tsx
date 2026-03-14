@@ -47,10 +47,10 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
       <div className="absolute bottom-4 rounded-[24px] p-4 anc-detail-panel" style={{ left: '320px', right: '320px' }}>
         <div className="flex items-center justify-between gap-4">
           <div>
-            <div className="text-[10px] uppercase tracking-[2px] mb-1" style={{ fontFamily: 'Oswald, sans-serif', color: '#5a7a9a' }}>
+            <div className="text-[10px] uppercase tracking-[2px] mb-1" style={{ fontFamily: "'Work Sans', sans-serif", color: '#5a7a9a' }}>
               Zone Editor
             </div>
-            <div className="text-lg tracking-wide" style={{ fontFamily: 'Oswald, sans-serif' }}>
+            <div className="text-lg tracking-wide" style={{ fontFamily: "'Work Sans', sans-serif" }}>
               Select a zone to edit
             </div>
             <div className="text-[11px] mt-1" style={{ color: '#6f88a0' }}>
@@ -73,10 +73,10 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
     <div className="absolute bottom-4 rounded-[24px] p-4 anc-detail-panel" style={{ left: '320px', right: '320px' }}>
       <div className="flex justify-between items-start gap-4 mb-4">
         <div className="min-w-0">
-          <div className="text-[10px] uppercase tracking-[2px] mb-1" style={{ fontFamily: 'Oswald, sans-serif', color: '#5a7a9a' }}>
+          <div className="text-[10px] uppercase tracking-[2px] mb-1" style={{ fontFamily: "'Work Sans', sans-serif", color: '#5a7a9a' }}>
             Zone Editor
           </div>
-          <div className="text-lg tracking-wide truncate" style={{ fontFamily: 'Oswald, sans-serif' }}>{zone.name}</div>
+          <div className="text-lg tracking-wide truncate" style={{ fontFamily: "'Work Sans', sans-serif" }}>{zone.name}</div>
           <div className="text-[11px] mt-1 max-w-[560px]" style={{ color: '#6f88a0' }}>
             Adjust the sponsor, content type, and LED product for this placement.
           </div>
@@ -131,7 +131,7 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
         <div className="anc-field-card">
           <label className="block text-[9px] uppercase tracking-[1.5px] mb-1" style={{ color: '#5a7a9a' }}>Pricing</label>
           <div className="rounded-2xl p-3" style={{ background: 'rgba(8, 14, 22, 0.92)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div className="text-xs font-semibold" style={{ color: '#00ff88' }}>
+            <div className="text-xs font-semibold" style={{ color: '#0A52EF' }}>
               ${zone.pricePerGame.toLocaleString()}/game
             </div>
             <div className="text-[9px]" style={{ color: '#5a7a9a' }}>
@@ -143,7 +143,7 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
         <div className="anc-field-card">
           <label className="block text-[9px] uppercase tracking-[1.5px] mb-1" style={{ color: '#5a7a9a' }}>Dimensions</label>
           <div className="rounded-2xl p-3" style={{ background: 'rgba(8, 14, 22, 0.92)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div className="text-xs font-semibold" style={{ color: '#00ccff' }}>
+            <div className="text-xs font-semibold" style={{ color: '#03B8FF' }}>
               {zone.width} × {zone.height}
             </div>
             <div className="text-[9px]" style={{ color: '#5a7a9a' }}>

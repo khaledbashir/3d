@@ -21,9 +21,9 @@ export function VenueSwitcher() {
           onClick={() => setVenueType(v.id)}
           className="text-[10px] px-2.5 py-1 rounded-full border cursor-pointer transition-all whitespace-nowrap"
           style={{
-            fontFamily: 'Oswald, sans-serif',
+            fontFamily: "'Work Sans', sans-serif",
             ...(venueType === v.id
-              ? { background: 'rgba(0,255,136,0.14)', borderColor: 'rgba(0,255,136,0.24)', color: '#dfffee', fontWeight: 600 }
+              ? { background: 'rgba(10,82,239,0.14)', borderColor: 'rgba(10,82,239,0.24)', color: '#d0e4ff', fontWeight: 600 }
               : { background: 'transparent', borderColor: 'transparent', color: '#7d93ab' }
             ),
           }}

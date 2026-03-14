@@ -59,7 +59,7 @@ function FieldSurface() {
     ctx.fillStyle = 'rgba(0,40,180,0.18)'; ctx.fillRect(0, 0, 102, 512)
     ctx.fillStyle = 'rgba(180,0,0,0.18)'; ctx.fillRect(922, 0, 102, 512)
 
-    ctx.fillStyle = 'rgba(255,255,255,0.12)'; ctx.font = 'bold 48px Oswald,sans-serif'
+    ctx.fillStyle = 'rgba(255,255,255,0.12)'; ctx.font = 'bold 48px Work Sans,sans-serif'
     ctx.save(); ctx.translate(50, 256); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText('HOME', 0, 0); ctx.restore()
     ctx.save(); ctx.translate(974, 256); ctx.rotate(Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText('AWAY', 0, 0); ctx.restore()
 
@@ -68,7 +68,7 @@ function FieldSurface() {
     for (let i = 0; i < 50; i++) { const x = 20 + i * 20; ctx.beginPath(); ctx.moveTo(x, 190); ctx.lineTo(x, 195); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, 317); ctx.lineTo(x, 322); ctx.stroke() }
 
     // Numbers
-    ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.font = 'bold 36px Oswald,sans-serif'; ctx.textAlign = 'center'
+    ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.font = 'bold 36px Work Sans,sans-serif'; ctx.textAlign = 'center'
     ;['10','20','30','40','50','40','30','20','10'].forEach((n, i) => { ctx.fillText(n, 102.4 + i * 102.4, 170); ctx.fillText(n, 102.4 + i * 102.4, 370) })
 
     return new CanvasTexture(canvas)

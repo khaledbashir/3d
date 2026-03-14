@@ -37,7 +37,7 @@ export function LEDScreen({ zone }: LEDScreenProps) {
       <mesh position={[0, 0, -0.25]}>
         <planeGeometry args={[zone.width + 6, zone.height + 6]} />
         <meshBasicMaterial
-          color={isSelected ? '#00ff88' : '#00ccff'}
+          color={isSelected ? '#0A52EF' : '#03B8FF'}
           transparent
           opacity={isSelected ? 0.08 : 0.025}
         />

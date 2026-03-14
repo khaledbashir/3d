@@ -27,7 +27,7 @@ export function renderLEDContent(
     ctx.fillStyle = '#0a0a0a'
     ctx.fillRect(0, 0, w, h)
     ctx.fillStyle = '#222'
-    ctx.font = `bold ${h * 0.3}px Oswald,sans-serif`
+    ctx.font = `bold ${h * 0.3}px Work Sans,sans-serif`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText('OFF', w / 2, h / 2)
@@ -62,7 +62,7 @@ export function renderLEDContent(
 
   // Selection border
   if (selected) {
-    ctx.strokeStyle = '#00ff88'
+    ctx.strokeStyle = '#0A52EF'
     ctx.lineWidth = 4
     ctx.setLineDash([10, 5])
     ctx.lineDashOffset = -frame * 2
@@ -73,11 +73,11 @@ export function renderLEDContent(
 
 function renderScore(ctx: CanvasRenderingContext2D, w: number, h: number, sponsor: Sponsor, _frame: number) {
   ctx.fillStyle = '#fff'
-  ctx.font = `bold ${h * 0.16}px Oswald,sans-serif`
+  ctx.font = `bold ${h * 0.16}px Work Sans,sans-serif`
   ctx.textBaseline = 'middle'
   ctx.fillText('NFL SUNDAY', w / 2, h * 0.17)
 
-  ctx.font = `bold ${h * 0.28}px Oswald,sans-serif`
+  ctx.font = `bold ${h * 0.28}px Work Sans,sans-serif`
   ctx.fillText('NYG', w * 0.22, h * 0.48)
   ctx.fillStyle = '#FFD700'
   ctx.fillText('24 – 17', w / 2, h * 0.48)
@@ -90,7 +90,7 @@ function renderScore(ctx: CanvasRenderingContext2D, w: number, h: number, sponso
 
   if (sponsor.id !== 'none') {
     ctx.fillStyle = 'rgba(255,255,255,0.45)'
-    ctx.font = `${h * 0.08}px Oswald,sans-serif`
+    ctx.font = `${h * 0.08}px Work Sans,sans-serif`
     ctx.textAlign = 'right'
     ctx.fillText('Presented by ' + sponsor.name, w - 12, h * 0.88)
   }
@@ -112,7 +112,7 @@ function renderLogo(ctx: CanvasRenderingContext2D, w: number, h: number, sponsor
 
   if (sponsor.id !== 'none') {
     ctx.fillStyle = '#fff'
-    ctx.font = `bold ${h * 0.4}px Oswald,sans-serif`
+    ctx.font = `bold ${h * 0.4}px Work Sans,sans-serif`
     ctx.textBaseline = 'middle'
     ctx.fillText(sponsor.logoText, w / 2, h / 2)
   } else {
@@ -126,7 +126,7 @@ function renderLogo(ctx: CanvasRenderingContext2D, w: number, h: number, sponsor
 function renderAd(ctx: CanvasRenderingContext2D, w: number, h: number, sponsor: Sponsor, frame: number) {
   if (sponsor.id !== 'none') {
     ctx.fillStyle = '#fff'
-    ctx.font = `bold ${h * 0.38}px Oswald,sans-serif`
+    ctx.font = `bold ${h * 0.38}px Work Sans,sans-serif`
     const scrollX = ((frame * 4) % (w * 2)) - w * 0.5
     ctx.textAlign = 'left'
     ctx.textBaseline = 'middle'
@@ -146,7 +146,7 @@ function renderReplay(ctx: CanvasRenderingContext2D, w: number, h: number, spons
   ctx.fillRect(10, 10, w - 20, h - 20)
 
   ctx.fillStyle = '#ff3333'
-  ctx.font = `bold ${h * 0.2}px Oswald,sans-serif`
+  ctx.font = `bold ${h * 0.2}px Work Sans,sans-serif`
   ctx.textBaseline = 'middle'
   ctx.fillText('► INSTANT REPLAY', w / 2, h * 0.38)
 
@@ -156,7 +156,7 @@ function renderReplay(ctx: CanvasRenderingContext2D, w: number, h: number, spons
 
   if (sponsor.id !== 'none') {
     ctx.fillStyle = 'rgba(255,255,255,0.4)'
-    ctx.font = `${h * 0.09}px Oswald,sans-serif`
+    ctx.font = `${h * 0.09}px Work Sans,sans-serif`
     ctx.fillText('Replay by ' + sponsor.name, w / 2, h * 0.76)
   }
 }
@@ -172,7 +172,7 @@ function renderAnimation(ctx: CanvasRenderingContext2D, w: number, h: number, sp
 
   if (sponsor.id !== 'none') {
     ctx.fillStyle = 'rgba(255,255,255,0.85)'
-    ctx.font = `bold ${h * 0.32}px Oswald,sans-serif`
+    ctx.font = `bold ${h * 0.32}px Work Sans,sans-serif`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText(sponsor.logoText, w / 2, h / 2)
