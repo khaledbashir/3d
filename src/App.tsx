@@ -8,6 +8,7 @@ import { DetailPanel } from '@/components/ui/DetailPanel'
 import { RoiPanel } from '@/components/ui/RoiPanel'
 import { SetupWizard } from '@/components/ui/SetupWizard'
 import { ExportSheet } from '@/components/ui/ExportSheet'
+import { PresentationMode } from '@/components/ui/PresentationMode'
 import { useVenueStore } from '@/stores/venueStore'
 import { decodeConfigFromUrl } from '@/utils/configUrl'
 
@@ -19,6 +20,7 @@ export default function App() {
   const [detailOpen, setDetailOpen] = useState(true)
   const [roiOpen, setRoiOpen] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(() => !localStorage.getItem('anc-wizard-seen'))
+  const [presenting, setPresenting] = useState(false)
 
   // Hydrate from URL hash on mount
   useEffect(() => {
@@ -60,27 +62,34 @@ export default function App() {
         </Canvas>
       </div>
 
-      <div className="absolute inset-0 z-10 pointer-events-none [&>*]:pointer-events-auto">
-        <Header
-          zonesOpen={zonesOpen}
-          insightsOpen={insightsOpen}
-          roiOpen={roiOpen}
-          onToggleZones={() => setZonesOpen(open => !open)}
-          onToggleInsights={() => { setInsightsOpen(open => !open); if (!insightsOpen) setRoiOpen(false) }}
-          onToggleRoi={() => { setRoiOpen(open => !open); if (!roiOpen) setInsightsOpen(false) }}
-          onOpenWizard={() => setWizardOpen(true)}
-        />
-        <ZonePanel open={zonesOpen} />
-        <RevenuePanel open={insightsOpen && !roiOpen} />
-        <RoiPanel open={roiOpen} />
-        <DetailPanel open={detailOpen} onClose={() => setDetailOpen(false)} />
+      {/* Normal UI — hidden during presentation */}
+      {!presenting && (
+        <div className="absolute inset-0 z-10 pointer-events-none [&>*]:pointer-events-auto">
+          <Header
+            zonesOpen={zonesOpen}
+            insightsOpen={insightsOpen}
+            roiOpen={roiOpen}
+            onToggleZones={() => setZonesOpen(open => !open)}
+            onToggleInsights={() => { setInsightsOpen(open => !open); if (!insightsOpen) setRoiOpen(false) }}
+            onToggleRoi={() => { setRoiOpen(open => !open); if (!roiOpen) setInsightsOpen(false) }}
+            onOpenWizard={() => setWizardOpen(true)}
+            onPresent={() => setPresenting(true)}
+          />
+          <ZonePanel open={zonesOpen} />
+          <RevenuePanel open={insightsOpen && !roiOpen} />
+          <RoiPanel open={roiOpen} />
+          <DetailPanel open={detailOpen} onClose={() => setDetailOpen(false)} />
 
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] opacity-70 text-center pointer-events-none anc-help-chip">
-          Click & drag to orbit · Scroll to zoom · Click LED zones to configure
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] opacity-70 text-center pointer-events-none anc-help-chip">
+            Click & drag to orbit · Scroll to zoom · Click LED zones to configure
+          </div>
         </div>
-      </div>
+      )}
 
-      <SetupWizard open={wizardOpen} onClose={handleCloseWizard} />
+      {/* Presentation mode overlay */}
+      <PresentationMode active={presenting} onExit={() => setPresenting(false)} />
+
+      <SetupWizard open={wizardOpen && !presenting} onClose={handleCloseWizard} />
       <ExportSheet />
     </div>
   )

@@ -13,6 +13,7 @@ interface HeaderProps {
   onToggleInsights: () => void
   onToggleRoi: () => void
   onOpenWizard: () => void
+  onPresent: () => void
 }
 
 export function Header({
@@ -23,6 +24,7 @@ export function Header({
   onToggleInsights,
   onToggleRoi,
   onOpenWizard,
+  onPresent,
 }: HeaderProps) {
   const simulating = useVenueStore(s => s.simulating)
   const toggleSimulation = useVenueStore(s => s.toggleSimulation)
@@ -119,6 +121,20 @@ export function Header({
 
           <button onClick={onOpenWizard} className="anc-toolbar-button">
             Guide
+          </button>
+
+          <button
+            onClick={onPresent}
+            className="px-4 py-2 rounded-xl text-[10px] font-bold uppercase transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #0A52EF, #03B8FF)',
+              color: '#fff',
+              fontFamily: "'Work Sans', sans-serif",
+              letterSpacing: '0.05em',
+              boxShadow: '0 0 20px rgba(10,82,239,0.3)',
+            }}
+          >
+            Present
           </button>
 
           <span className="anc-status-pill">
