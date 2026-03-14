@@ -50,6 +50,15 @@ interface VenueStore {
   loadConfig: (id: string) => void
   deleteConfig: (id: string) => void
 
+  // Client branding
+  clientLogo: string | null
+  clientName: string
+  setClientLogo: (url: string | null) => void
+  setClientName: (name: string) => void
+
+  // Package tiers
+  applyPackage: (tier: 'budget' | 'standard' | 'premium') => void
+
   // Hydrate from snapshot (for shareable links)
   hydrateFromSnapshot: (snapshot: { venueType: VenueType; zones: LEDZone[]; sponsors: Sponsor[] }) => void
 
@@ -135,6 +144,36 @@ export const useVenueStore = create<VenueStore>()(
       addCustomSponsor: (sponsor) => set(state => ({
         sponsors: [...state.sponsors, sponsor],
       })),
+
+      // Client branding
+      clientLogo: null,
+      clientName: '',
+      setClientLogo: (url) => set({ clientLogo: url }),
+      setClientName: (name) => set({ clientName: name }),
+
+      // Package tiers
+      applyPackage: (tier) => set(state => {
+        const zones = state.zones.map((z, i) => {
+          const copy = { ...z }
+          switch (tier) {
+            case 'budget':
+              // Only scoreboards and main boards
+              copy.enabled = z.type === 'videoboard'
+              break
+            case 'standard':
+              // Scoreboards + ribbons + fascia
+              copy.enabled = ['videoboard', 'ribbon', 'fascia', 'courtside'].includes(z.type)
+              break
+            case 'premium':
+              // Everything on
+              copy.enabled = true
+              break
+          }
+          copy.content = 'logo'
+          return copy
+        })
+        return { zones }
+      }),
 
       // Save/Load
       savedConfigs: [],

@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useVenueStore } from '@/stores/venueStore'
-import { presets } from '@/data/presets'
 import { venues } from '@/data/venues'
+import { setClientLogoForRenderer } from '@/utils/ledRenderer'
+import type { VenueType } from '@/types'
 
 interface PresentationModeProps {
   active: boolean
   onExit: () => void
 }
 
-// Cinematic camera positions per venue
 const cameraShots: Record<string, { angle: number; pitch: number; distance: number; label: string }[]> = {
   nfl: [
     { angle: 0.3, pitch: 0.4, distance: 250, label: 'Overview' },
@@ -41,38 +41,59 @@ const cameraShots: Record<string, { angle: number; pitch: number; distance: numb
   ],
 }
 
-// Presentation scenarios — what a sales rep would click
 const scenarios = [
-  { id: 'gameday', label: 'Game Day', preset: 'scores', description: 'Live scores and stats across all displays' },
-  { id: 'sponsors', label: 'Sponsors', preset: 'logos', description: 'All sponsor logos front and center' },
-  { id: 'halftime', label: 'Halftime', preset: 'halftime', description: 'Dynamic animations and energy' },
-  { id: 'dark', label: 'Lights Out', preset: 'alloff', description: 'Venue without LED — the before picture' },
-  { id: 'full', label: 'Full Package', preset: 'allon', description: 'Every zone lit up and active' },
+  { id: 'gameday', label: 'Game Day', preset: 'scores', description: 'Live scores on all displays' },
+  { id: 'sponsors', label: 'Sponsors', preset: 'logos', description: 'Sponsor logos front and center' },
+  { id: 'halftime', label: 'Halftime', preset: 'halftime', description: 'Dynamic energy and animations' },
+  { id: 'dark', label: 'Before', preset: 'alloff', description: 'Venue without LED screens' },
+  { id: 'full', label: 'Full Build', preset: 'allon', description: 'Every zone active' },
+]
+
+const packages = [
+  { id: 'budget' as const, label: 'Budget', description: 'Scoreboards only', color: '#5a7a9a' },
+  { id: 'standard' as const, label: 'Standard', description: 'Boards + ribbons + fascia', color: '#03B8FF' },
+  { id: 'premium' as const, label: 'Premium', description: 'Full venue coverage', color: '#0A52EF' },
 ]
 
 export function PresentationMode({ active, onExit }: PresentationModeProps) {
   const venueType = useVenueStore(s => s.venueType)
   const setTargetCamera = useVenueStore(s => s.setTargetCamera)
   const applyPreset = useVenueStore(s => s.applyPreset)
+  const applyPackage = useVenueStore(s => s.applyPackage)
   const getRevenue = useVenueStore(s => s.getRevenue)
   const zones = useVenueStore(s => s.zones)
   const setVenueType = useVenueStore(s => s.setVenueType)
+  const clientLogo = useVenueStore(s => s.clientLogo)
+  const clientName = useVenueStore(s => s.clientName)
+  const setClientLogo = useVenueStore(s => s.setClientLogo)
+  const setClientName = useVenueStore(s => s.setClientName)
 
   const [activeScenario, setActiveScenario] = useState('full')
+  const [activePackage, setActivePackage] = useState<string | null>(null)
   const [activeShotIdx, setActiveShotIdx] = useState(0)
   const [autoRotate, setAutoRotate] = useState(false)
+  const [flythrough, setFlythrough] = useState(false)
   const [showRevenue, setShowRevenue] = useState(true)
+  const [showBranding, setShowBranding] = useState(false)
   const autoRotateRef = useRef<number>()
+  const flythroughRef = useRef<{ shotIdx: number; timer: number }>({ shotIdx: 0, timer: 0 })
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const revenue = getRevenue()
   const shots = cameraShots[venueType] || cameraShots.nfl
+  const activeCount = zones.filter(z => z.enabled).length
 
-  // Auto-rotate camera
+  // Sync client logo with renderer
   useEffect(() => {
-    if (!active || !autoRotate) {
+    setClientLogoForRenderer(clientLogo)
+  }, [clientLogo])
+
+  // Auto-rotate
+  useEffect(() => {
+    if (!active || !autoRotate || flythrough) {
       if (autoRotateRef.current) cancelAnimationFrame(autoRotateRef.current)
       return
     }
-
     let angle = useVenueStore.getState().targetCamera.angle
     const tick = () => {
       angle += 0.003
@@ -80,22 +101,64 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
       autoRotateRef.current = requestAnimationFrame(tick)
     }
     autoRotateRef.current = requestAnimationFrame(tick)
-
     return () => { if (autoRotateRef.current) cancelAnimationFrame(autoRotateRef.current) }
-  }, [active, autoRotate, setTargetCamera])
+  }, [active, autoRotate, flythrough, setTargetCamera])
+
+  // Cinematic flythrough — auto-cycles through camera shots
+  useEffect(() => {
+    if (!active || !flythrough) return
+    const ref = flythroughRef.current
+    ref.shotIdx = 0
+    ref.timer = 0
+
+    // Start with first shot
+    const shot = shots[0]
+    if (shot) setTargetCamera(shot)
+    setActiveShotIdx(0)
+
+    const interval = setInterval(() => {
+      ref.shotIdx = (ref.shotIdx + 1) % shots.length
+      const nextShot = shots[ref.shotIdx]
+      if (nextShot) {
+        setTargetCamera(nextShot)
+        setActiveShotIdx(ref.shotIdx)
+      }
+    }, 5000) // 5 seconds per shot
+
+    return () => clearInterval(interval)
+  }, [active, flythrough, shots, setTargetCamera])
 
   const handleScenario = useCallback((id: string) => {
     const scenario = scenarios.find(s => s.id === id)
     if (!scenario) return
     setActiveScenario(id)
+    setActivePackage(null)
     applyPreset(scenario.preset)
   }, [applyPreset])
 
+  const handlePackage = useCallback((tier: 'budget' | 'standard' | 'premium') => {
+    setActivePackage(tier)
+    setActiveScenario('')
+    applyPackage(tier)
+  }, [applyPackage])
+
   const handleShot = useCallback((idx: number) => {
     setActiveShotIdx(idx)
+    setFlythrough(false)
     const shot = shots[idx]
     if (shot) setTargetCamera(shot)
   }, [shots, setTargetCamera])
+
+  const handleLogoUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !file.type.startsWith('image/')) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const url = ev.target?.result as string
+      if (url) setClientLogo(url)
+    }
+    reader.readAsDataURL(file)
+  }, [setClientLogo])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -104,10 +167,10 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
       if (e.key === 'Escape') onExit()
       if (e.key === 'r' || e.key === 'R') setAutoRotate(r => !r)
       if (e.key === 's' || e.key === 'S') setShowRevenue(r => !r)
-      // Number keys for scenarios
+      if (e.key === 'f' || e.key === 'F') setFlythrough(f => !f)
+      if (e.key === 'b' || e.key === 'B') setShowBranding(b => !b)
       const num = parseInt(e.key)
       if (num >= 1 && num <= scenarios.length) handleScenario(scenarios[num - 1].id)
-      // Arrow keys for camera shots
       if (e.key === 'ArrowRight') handleShot((activeShotIdx + 1) % shots.length)
       if (e.key === 'ArrowLeft') handleShot((activeShotIdx - 1 + shots.length) % shots.length)
     }
@@ -117,8 +180,6 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
 
   if (!active) return null
 
-  const activeCount = zones.filter(z => z.enabled).length
-
   return (
     <AnimatePresence>
       <motion.div
@@ -127,65 +188,124 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
         exit={{ opacity: 0 }}
         className="absolute inset-0 z-30 pointer-events-none"
       >
-        {/* Top bar — minimal branding */}
-        <motion.div
-          initial={{ y: -60 }}
-          animate={{ y: 0 }}
-          className="absolute top-0 left-0 right-0 pointer-events-auto"
-        >
+        {/* Top bar */}
+        <motion.div initial={{ y: -60 }} animate={{ y: 0 }} className="absolute top-0 left-0 right-0 pointer-events-auto">
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-3">
               <img src="/anc-logo-white.png" alt="ANC" className="h-7 object-contain opacity-80" />
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-white/80" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                  Venue Vision
+                  {clientName || 'Venue Vision'}
                 </div>
                 <div className="text-[9px] uppercase tracking-widest text-white/40">
                   {venues.find(v => v.id === venueType)?.name || 'Venue'}
                 </div>
               </div>
+              {clientLogo && (
+                <img src={clientLogo} alt="" className="h-6 object-contain opacity-70 ml-2" />
+              )}
             </div>
 
-            <div className="flex items-center gap-3">
-              {/* Venue switcher — compact */}
+            <div className="flex items-center gap-2">
+              {/* Venue switcher */}
               <div className="flex gap-1">
                 {venues.map(v => (
-                  <button
-                    key={v.id}
-                    onClick={() => setVenueType(v.id)}
+                  <button key={v.id} onClick={() => setVenueType(v.id)}
                     className="px-2.5 py-1 rounded-lg text-[9px] uppercase font-semibold transition-all"
                     style={{
                       background: venueType === v.id ? 'rgba(10,82,239,0.3)' : 'rgba(255,255,255,0.06)',
                       color: venueType === v.id ? '#fff' : 'rgba(255,255,255,0.4)',
                       border: venueType === v.id ? '1px solid rgba(10,82,239,0.4)' : '1px solid transparent',
-                    }}
-                  >
+                    }}>
                     {v.id}
                   </button>
                 ))}
               </div>
 
-              <button
-                onClick={() => setAutoRotate(r => !r)}
+              <span className="w-px h-4" style={{ background: 'rgba(255,255,255,0.1)' }} />
+
+              <button onClick={() => setShowBranding(b => !b)}
                 className="px-3 py-1.5 rounded-lg text-[9px] uppercase font-semibold transition-all"
-                style={{
-                  background: autoRotate ? 'rgba(10,82,239,0.25)' : 'rgba(255,255,255,0.06)',
-                  color: autoRotate ? '#fff' : 'rgba(255,255,255,0.4)',
-                }}
-              >
-                {autoRotate ? 'Stop Rotate' : 'Auto Rotate'}
+                style={{ background: showBranding ? 'rgba(10,82,239,0.25)' : 'rgba(255,255,255,0.06)', color: showBranding ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+                Client
               </button>
 
-              <button
-                onClick={onExit}
+              <button onClick={() => setFlythrough(f => !f)}
+                className="px-3 py-1.5 rounded-lg text-[9px] uppercase font-semibold transition-all"
+                style={{ background: flythrough ? 'rgba(10,82,239,0.25)' : 'rgba(255,255,255,0.06)', color: flythrough ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+                {flythrough ? 'Stop Tour' : 'Tour'}
+              </button>
+
+              <button onClick={() => setAutoRotate(r => !r)}
+                className="px-3 py-1.5 rounded-lg text-[9px] uppercase font-semibold transition-all"
+                style={{ background: autoRotate ? 'rgba(10,82,239,0.25)' : 'rgba(255,255,255,0.06)', color: autoRotate ? '#fff' : 'rgba(255,255,255,0.4)' }}>
+                Rotate
+              </button>
+
+              <button onClick={onExit}
                 className="px-3 py-1.5 rounded-lg text-[9px] uppercase font-semibold text-white/50 transition-all"
-                style={{ background: 'rgba(255,255,255,0.06)' }}
-              >
-                Exit · ESC
+                style={{ background: 'rgba(255,255,255,0.06)' }}>
+                Exit
               </button>
             </div>
           </div>
         </motion.div>
+
+        {/* Client branding panel */}
+        <AnimatePresence>
+          {showBranding && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="absolute top-20 left-6 pointer-events-auto"
+            >
+              <div className="rounded-2xl px-4 py-4 w-[220px]" style={{
+                background: 'rgba(0,5,15,0.8)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.06)',
+              }}>
+                <div className="text-[8px] uppercase tracking-[3px] mb-3 text-white/30">Client Branding</div>
+
+                <input
+                  type="text"
+                  value={clientName}
+                  onChange={e => setClientName(e.target.value)}
+                  placeholder="Client name..."
+                  className="w-full h-[32px] rounded-lg px-2.5 text-[11px] text-white outline-none mb-2"
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}
+                />
+
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full rounded-lg px-2.5 py-2 text-[10px] text-center transition-all cursor-pointer"
+                  style={{
+                    background: clientLogo ? 'rgba(10,82,239,0.15)' : 'rgba(255,255,255,0.04)',
+                    border: `1px dashed ${clientLogo ? 'rgba(10,82,239,0.3)' : 'rgba(255,255,255,0.1)'}`,
+                    color: clientLogo ? '#0A52EF' : 'rgba(255,255,255,0.35)',
+                  }}
+                >
+                  {clientLogo ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <img src={clientLogo} alt="" className="h-4 object-contain" />
+                      <span>Change Logo</span>
+                    </div>
+                  ) : (
+                    'Upload Client Logo'
+                  )}
+                </button>
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+
+                {clientLogo && (
+                  <button
+                    onClick={() => setClientLogo(null)}
+                    className="w-full mt-1.5 text-[9px] py-1 text-white/30 transition-all hover:text-white/50"
+                  >
+                    Remove logo
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Revenue overlay */}
         <AnimatePresence>
@@ -197,9 +317,7 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
               className="absolute top-20 right-6 pointer-events-none"
             >
               <div className="rounded-2xl px-5 py-4" style={{
-                background: 'rgba(0,5,15,0.7)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255,255,255,0.06)',
+                background: 'rgba(0,5,15,0.7)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.06)',
               }}>
                 <div className="text-[8px] uppercase tracking-[3px] mb-2 text-white/30">Revenue Impact</div>
                 <div className="text-3xl font-bold text-white" style={{ fontFamily: "'Work Sans', sans-serif", letterSpacing: '-0.03em' }}>
@@ -221,37 +339,57 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
           )}
         </AnimatePresence>
 
-        {/* Bottom control bar */}
-        <motion.div
-          initial={{ y: 80 }}
-          animate={{ y: 0 }}
-          className="absolute bottom-0 left-0 right-0 pointer-events-auto"
-        >
-          <div className="flex items-end justify-between px-6 pb-6">
-            {/* Scenario buttons */}
-            <div className="flex gap-2">
-              {scenarios.map((s, i) => (
-                <button
-                  key={s.id}
-                  onClick={() => handleScenario(s.id)}
-                  className="group relative rounded-xl px-4 py-3 text-left transition-all"
-                  style={{
-                    background: activeScenario === s.id ? 'rgba(10,82,239,0.2)' : 'rgba(0,5,15,0.6)',
-                    backdropFilter: 'blur(16px)',
-                    border: `1px solid ${activeScenario === s.id ? 'rgba(10,82,239,0.35)' : 'rgba(255,255,255,0.06)'}`,
-                    minWidth: '110px',
-                  }}
-                >
-                  <div className="text-[11px] font-semibold text-white uppercase" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                    {s.label}
-                  </div>
-                  <div className="text-[8px] mt-0.5 text-white/35">{s.description}</div>
-                  <div className="absolute top-1 right-2 text-[8px] text-white/20">{i + 1}</div>
-                </button>
-              ))}
+        {/* Bottom controls */}
+        <motion.div initial={{ y: 80 }} animate={{ y: 0 }} className="absolute bottom-0 left-0 right-0 pointer-events-auto">
+          <div className="flex items-end justify-between px-6 pb-5">
+            {/* Left: Scenarios + Packages */}
+            <div className="flex flex-col gap-2">
+              {/* Package tiers */}
+              <div className="flex gap-1.5">
+                {packages.map(pkg => (
+                  <button
+                    key={pkg.id}
+                    onClick={() => handlePackage(pkg.id)}
+                    className="rounded-lg px-3 py-2 transition-all"
+                    style={{
+                      background: activePackage === pkg.id ? `${pkg.color}22` : 'rgba(0,5,15,0.5)',
+                      backdropFilter: 'blur(12px)',
+                      border: `1px solid ${activePackage === pkg.id ? `${pkg.color}55` : 'rgba(255,255,255,0.04)'}`,
+                    }}
+                  >
+                    <div className="text-[10px] font-semibold uppercase" style={{ color: activePackage === pkg.id ? pkg.color : 'rgba(255,255,255,0.5)', fontFamily: "'Work Sans', sans-serif" }}>
+                      {pkg.label}
+                    </div>
+                    <div className="text-[7px] text-white/25">{pkg.description}</div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Scenarios */}
+              <div className="flex gap-1.5">
+                {scenarios.map((s, i) => (
+                  <button
+                    key={s.id}
+                    onClick={() => handleScenario(s.id)}
+                    className="group relative rounded-xl px-4 py-2.5 text-left transition-all"
+                    style={{
+                      background: activeScenario === s.id ? 'rgba(10,82,239,0.2)' : 'rgba(0,5,15,0.6)',
+                      backdropFilter: 'blur(16px)',
+                      border: `1px solid ${activeScenario === s.id ? 'rgba(10,82,239,0.35)' : 'rgba(255,255,255,0.06)'}`,
+                      minWidth: '100px',
+                    }}
+                  >
+                    <div className="text-[10px] font-semibold text-white uppercase" style={{ fontFamily: "'Work Sans', sans-serif" }}>
+                      {s.label}
+                    </div>
+                    <div className="text-[7px] mt-0.5 text-white/30">{s.description}</div>
+                    <div className="absolute top-1 right-1.5 text-[7px] text-white/15">{i + 1}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Camera shots */}
+            {/* Right: Camera shots */}
             <div className="flex gap-1.5">
               {shots.map((shot, idx) => (
                 <button
@@ -271,10 +409,9 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
             </div>
           </div>
 
-          {/* Keyboard hints */}
-          <div className="text-center pb-3">
-            <span className="text-[8px] text-white/15 tracking-wider">
-              1-5 Scenarios · Arrow keys Camera · R Rotate · S Revenue · ESC Exit
+          <div className="text-center pb-2.5">
+            <span className="text-[7px] text-white/12 tracking-wider">
+              1-5 Scenarios · Arrows Camera · F Tour · R Rotate · B Branding · S Revenue · ESC Exit
             </span>
           </div>
         </motion.div>
