@@ -24,10 +24,7 @@ export function Header({
     <div className="absolute top-0 left-0 right-0 z-20 px-4 pt-3">
       <div className="anc-topbar flex items-center justify-between gap-3 rounded-2xl px-4 py-3">
         <div className="flex min-w-0 items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm text-black"
-            style={{ background: 'linear-gradient(135deg, #00ff88, #00ccff)', fontFamily: 'Oswald, sans-serif' }}>
-            V
-          </div>
+          <img src="/anc-logo-white.png" alt="ANC" className="h-8 object-contain" />
           <div className="min-w-0">
             <h1 className="text-sm font-semibold tracking-wider" style={{ fontFamily: 'Oswald, sans-serif', fontSize: '15px' }}>
               ANC VENUE VISION
