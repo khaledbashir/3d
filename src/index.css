@@ -40,8 +40,8 @@ body {
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1a2a3a; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #2a3a4a; }
+::-webkit-scrollbar-thumb { background: #0385DD; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #0A52EF; }
 
 select {
   appearance: none;

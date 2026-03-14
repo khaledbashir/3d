@@ -188,7 +188,7 @@ export function VenueScene() {
         castShadow
         shadow-mapSize={[2048, 2048]}
       />
-      <fog attach="fog" args={['#080c12', 100, 600]} />
+      <fog attach="fog" args={['#000a1a', 100, 600]} />
 
       <CameraController />
       <OrbitHandler />

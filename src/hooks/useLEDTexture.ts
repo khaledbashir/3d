@@ -15,6 +15,18 @@ export function useLEDTexture(
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
   const frameRef = useRef(0)
 
+  // Use refs for values that change frequently so the rAF loop
+  // always reads current values without needing to restart
+  const contentRef = useRef(content)
+  const sponsorRef = useRef(sponsor)
+  const selectedRef = useRef(selected)
+  const enabledRef = useRef(enabled)
+
+  contentRef.current = content
+  sponsorRef.current = sponsor
+  selectedRef.current = selected
+  enabledRef.current = enabled
+
   const canvas = useMemo(() => {
     const c = document.createElement('canvas')
     c.width = 512
@@ -46,13 +58,20 @@ export function useLEDTexture(
       const c = canvasRef.current
       if (!ctx || !c) return
 
-      renderLEDContent(ctx, c.width, c.height, content, sponsor, frameRef.current, selected, enabled)
+      renderLEDContent(
+        ctx, c.width, c.height,
+        contentRef.current,
+        sponsorRef.current,
+        frameRef.current,
+        selectedRef.current,
+        enabledRef.current,
+      )
       texture.needsUpdate = true
     }
 
     animId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(animId)
-  }, [content, sponsor, selected, enabled, texture])
+  }, [texture])
 
   return texture
 }
