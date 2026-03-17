@@ -9,7 +9,12 @@ interface SetupWizardProps {
   onClose: () => void
 }
 
-const venueIcons: Record<VenueType, string> = { nfl: 'Stadium', nba: 'Arena', mall: 'Retail', transit: 'Transit' }
+const venueLabels: Record<VenueType, { name: string; desc: string }> = {
+  nfl: { name: 'Stadium', desc: 'Football · Outdoor' },
+  nba: { name: 'Arena', desc: 'Basketball · Indoor' },
+  mall: { name: 'Retail', desc: 'Shopping · Commercial' },
+  transit: { name: 'Transit', desc: 'Station · Public' },
+}
 
 export function SetupWizard({ open, onClose }: SetupWizardProps) {
   const [step, setStep] = useState(0)
@@ -30,22 +35,22 @@ export function SetupWizard({ open, onClose }: SetupWizardProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
       <div className="relative w-[520px] max-h-[85vh] overflow-y-auto anc-panel rounded-2xl p-6">
-        {/* Progress dots */}
-        <div className="flex items-center justify-center gap-2 mb-6">
-          {steps.map((s, i) => (
-            <div key={s} className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5">
+        {/* Progress */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="text-[9px] uppercase tracking-wider" style={{ color: '#5a7a9a' }}>
+            Step {step + 1} of {steps.length}
+          </div>
+          <div className="flex items-center gap-1.5">
+            {steps.map((s, i) => (
+              <div key={s} className="flex items-center gap-1.5">
                 <div
-                  className="w-2.5 h-2.5 rounded-full transition-all"
+                  className="w-2 h-2 rounded-full transition-all"
                   style={{ background: i <= step ? '#0A52EF' : 'rgba(255,255,255,0.12)' }}
                 />
-                <span className="text-[9px] uppercase tracking-wider" style={{ color: i <= step ? '#fff' : '#5a7a9a' }}>
-                  {s}
-                </span>
+                {i < steps.length - 1 && <div className="w-4 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />}
               </div>
-              {i < steps.length - 1 && <div className="w-6 h-px" style={{ background: 'rgba(255,255,255,0.1)' }} />}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <AnimatePresence mode="wait">
@@ -59,23 +64,26 @@ export function SetupWizard({ open, onClose }: SetupWizardProps) {
             {step === 0 && (
               <div>
                 <h2 className="text-lg font-bold mb-1" style={{ fontFamily: "'Work Sans', sans-serif" }}>Pick Your Venue</h2>
-                <p className="text-[11px] mb-4" style={{ color: '#6888a8' }}>Select the venue type to configure LED placements.</p>
+                <p className="text-[11px] mb-4" style={{ color: '#6888a8' }}>What type of venue are you configuring?</p>
                 <div className="grid grid-cols-2 gap-2">
-                  {venues.map(v => (
-                    <button
-                      key={v.id}
-                      onClick={() => setVenueType(v.id)}
-                      className="text-left rounded-xl px-4 py-3 cursor-pointer transition-all"
-                      style={{
-                        background: venueType === v.id ? 'rgba(10,82,239,0.12)' : 'rgba(8,14,22,0.9)',
-                        border: `1px solid ${venueType === v.id ? 'rgba(10,82,239,0.3)' : 'rgba(255,255,255,0.06)'}`,
-                      }}
-                    >
-                      <div className="text-sm font-semibold text-white">{venueIcons[v.id]}</div>
-                      <div className="text-[12px] text-white">{v.name}</div>
-                      <div className="text-[9px] mt-0.5" style={{ color: '#6888a8' }}>{v.description}</div>
-                    </button>
-                  ))}
+                  {venues.map(v => {
+                    const info = venueLabels[v.id]
+                    return (
+                      <button
+                        key={v.id}
+                        onClick={() => setVenueType(v.id)}
+                        className="text-left rounded-xl px-4 py-3 cursor-pointer transition-all"
+                        style={{
+                          background: venueType === v.id ? 'rgba(10,82,239,0.12)' : 'rgba(8,14,22,0.9)',
+                          border: `1px solid ${venueType === v.id ? 'rgba(10,82,239,0.3)' : 'rgba(255,255,255,0.06)'}`,
+                        }}
+                      >
+                        <div className="text-sm font-semibold text-white">{info.name}</div>
+                        <div className="text-[9px] mt-0.5" style={{ color: '#6888a8' }}>{info.desc}</div>
+                        <div className="text-[8px] mt-1" style={{ color: '#5a7a9a' }}>{v.name}</div>
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}
@@ -134,8 +142,8 @@ export function SetupWizard({ open, onClose }: SetupWizardProps) {
 
             {step === 3 && (
               <div>
-                <h2 className="text-lg font-bold mb-1" style={{ fontFamily: "'Work Sans', sans-serif" }}>Ready to Go</h2>
-                <p className="text-[11px] mb-4" style={{ color: '#6888a8' }}>Here's your configuration summary.</p>
+                <h2 className="text-lg font-bold mb-1" style={{ fontFamily: "'Work Sans', sans-serif" }}>Configuration Complete</h2>
+                <p className="text-[11px] mb-4" style={{ color: '#6888a8' }}>Here's your estimated revenue impact.</p>
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(8,14,22,0.9)', border: '1px solid rgba(255,255,255,0.06)' }}>
                     <div className="text-lg font-bold" style={{ color: '#0A52EF' }}>{revenue.activeCount}</div>
@@ -160,7 +168,7 @@ export function SetupWizard({ open, onClose }: SetupWizardProps) {
           {step > 0 ? (
             <button onClick={() => setStep(s => s - 1)} className="anc-toolbar-button">Back</button>
           ) : (
-            <button onClick={onClose} className="anc-toolbar-button">Skip</button>
+            <button onClick={onClose} className="anc-toolbar-button">Skip Setup</button>
           )}
           {step < 3 ? (
             <button

@@ -22,26 +22,26 @@ export function RevenuePanel({ open }: RevenuePanelProps) {
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
             <div className="text-[10px] uppercase tracking-[2px] mb-1" style={{ fontFamily: "'Work Sans', sans-serif", color: '#5a7a9a' }}>
-              Revenue Snapshot
+              Revenue Summary
             </div>
-            <div className="text-sm font-semibold text-white">Fewer panels, clearer numbers</div>
+            <div className="text-sm font-semibold text-white">{revenue.activeCount} zones booked</div>
           </div>
           <div className="text-right">
-            <div className="text-[10px]" style={{ color: '#5a7a9a' }}>Booked</div>
+            <div className="text-[10px]" style={{ color: '#5a7a9a' }}>Coverage</div>
             <div className="text-lg font-semibold" style={{ color: '#d0e4ff', fontFamily: "'Work Sans', sans-serif" }}>
-              {revenue.activeCount}
+              {revenue.occupancy}%
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="rounded-2xl p-3" style={{ background: 'rgba(8, 14, 22, 0.9)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="rounded-xl p-3" style={{ background: 'rgba(8, 14, 22, 0.9)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="text-[9px] uppercase tracking-[2px] mb-1" style={{ color: '#5a7a9a' }}>Per Game</div>
             <div className="text-xl font-bold" style={{ fontFamily: "'Work Sans', sans-serif", color: '#0A52EF' }}>
               ${revenue.perGame.toLocaleString()}
             </div>
           </div>
-          <div className="rounded-2xl p-3" style={{ background: 'rgba(8, 14, 22, 0.9)', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="rounded-xl p-3" style={{ background: 'rgba(8, 14, 22, 0.9)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <div className="text-[9px] uppercase tracking-[2px] mb-1" style={{ color: '#5a7a9a' }}>Per Season</div>
             <div className="text-xl font-bold" style={{ fontFamily: "'Work Sans', sans-serif", color: '#03B8FF' }}>
               ${revenue.perSeason.toLocaleString()}
@@ -49,12 +49,12 @@ export function RevenuePanel({ open }: RevenuePanelProps) {
           </div>
         </div>
 
-        <div className="rounded-2xl p-3" style={{ background: 'rgba(8, 14, 22, 0.9)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="rounded-xl p-3" style={{ background: 'rgba(8, 14, 22, 0.9)', border: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="flex justify-between items-center">
-            <span className="text-[9px] uppercase tracking-[2px]" style={{ color: '#5a7a9a' }}>Zone Occupancy</span>
-            <span className="text-xs font-bold">{revenue.occupancy}%</span>
+            <span className="text-[9px] uppercase tracking-[2px]" style={{ color: '#5a7a9a' }}>Active Zones</span>
+            <span className="text-xs font-bold">{revenue.activeCount}/{revenue.totalCount}</span>
           </div>
-          <div className="w-full h-1.5 rounded-full mt-1.5 overflow-hidden" style={{ background: '#1a2a3a' }}>
+          <div className="w-full h-1.5 rounded-full mt-1.5 overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
             <div className="h-full rounded-full transition-all duration-500"
               style={{ width: `${revenue.occupancy}%`, background: 'linear-gradient(90deg, #0A52EF, #03B8FF)' }} />
           </div>
@@ -63,12 +63,12 @@ export function RevenuePanel({ open }: RevenuePanelProps) {
 
       <div className="anc-panel rounded-2xl p-4">
         <div className="text-[10px] uppercase tracking-[2px] mb-3" style={{ fontFamily: "'Work Sans', sans-serif", color: '#5a7a9a' }}>
-          Active Breakdown
+          Revenue by Zone
         </div>
         <div className="flex flex-col gap-2">
           {activeZones.length === 0 && (
-            <div className="rounded-2xl border px-3 py-4 text-[11px]" style={{ borderColor: 'rgba(255,255,255,0.06)', color: '#6f88a0' }}>
-              Turn on a zone to see live revenue detail here.
+            <div className="rounded-xl border px-3 py-4 text-[11px] text-center" style={{ borderColor: 'rgba(255,255,255,0.06)', color: '#6f88a0' }}>
+              Enable zones to see revenue breakdown.
             </div>
           )}
           {activeZones.map(zone => {
@@ -76,16 +76,16 @@ export function RevenuePanel({ open }: RevenuePanelProps) {
             return (
               <div
                 key={zone.id}
-                className="flex items-center justify-between px-3 py-2.5 rounded-2xl text-[10px]"
+                className="flex items-center justify-between px-3 py-2 rounded-xl text-[10px]"
                 style={{ background: 'rgba(8, 14, 22, 0.9)', border: '1px solid rgba(255,255,255,0.05)' }}
               >
-                <span className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#0A52EF' }} />
-                  <span className="truncate max-w-[105px]" style={{ color: '#d5e5f3' }}>{zone.name}</span>
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: '#0A52EF' }} />
+                  <span className="truncate" style={{ color: '#d5e5f3', maxWidth: '100px' }}>{zone.name}</span>
                 </span>
-                <span className="flex items-center gap-2">
-                  {sp.id !== 'none' && <span className="font-semibold text-white">{sp.name}</span>}
-                  <span style={{ color: '#5a7a9a' }}>${zone.pricePerGame.toLocaleString()}/g</span>
+                <span className="flex items-center gap-2 flex-shrink-0">
+                  {sp.id !== 'none' && <span className="font-medium text-white">{sp.name}</span>}
+                  <span style={{ color: '#5a7a9a' }}>${zone.pricePerGame.toLocaleString()}</span>
                 </span>
               </div>
             )

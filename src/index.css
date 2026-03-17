@@ -7,7 +7,7 @@
   --color-anc-border: #0385DD;
   --color-anc-green: #0A52EF;
   --color-anc-cyan: #03B8FF;
-  --color-anc-gold: #03B8FF;
+  --color-anc-accent: #03B8FF;
   --color-anc-text: #b0c4d8;
   --color-anc-muted: #6888a8;
   --color-anc-dim: #0385DD;
@@ -51,8 +51,13 @@ select {
   padding-right: 30px !important;
 }
 
-select:focus {
+select:focus, input:focus, button:focus-visible {
   border-color: #0A52EF !important;
+  outline: none;
+}
+
+button:focus-visible {
+  box-shadow: 0 0 0 2px rgba(10,82,239,0.3);
 }
 
 select option {

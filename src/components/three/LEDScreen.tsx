@@ -40,10 +40,10 @@ export function LEDScreen({ zone }: LEDScreenProps) {
 
       {/* Light spill on surrounding surfaces */}
       <pointLight
-        position={[0, 0, 3]}
+        position={[0, 0, 4]}
         color={zone.enabled ? (sponsor.id !== 'none' ? sponsor.color : '#0A52EF') : '#000000'}
-        intensity={zone.enabled ? 0.4 : 0}
-        distance={zone.width * 1.5}
+        intensity={zone.enabled ? 1.2 : 0}
+        distance={zone.width * 2}
         decay={2}
       />
 

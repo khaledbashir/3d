@@ -11,6 +11,7 @@ import { ExportSheet } from '@/components/ui/ExportSheet'
 import { PresentationMode } from '@/components/ui/PresentationMode'
 import { useVenueStore } from '@/stores/venueStore'
 import { decodeConfigFromUrl } from '@/utils/configUrl'
+import { preloadSponsorLogos } from '@/utils/preloadLogos'
 
 export default function App() {
   const selectedZoneId = useVenueStore(s => s.selectedZoneId)
@@ -22,8 +23,9 @@ export default function App() {
   const [wizardOpen, setWizardOpen] = useState(() => !localStorage.getItem('anc-wizard-seen'))
   const [presenting, setPresenting] = useState(false)
 
-  // Hydrate from URL hash on mount
+  // Preload sponsor logos + hydrate from URL hash on mount
   useEffect(() => {
+    preloadSponsorLogos()
     const snapshot = decodeConfigFromUrl()
     if (snapshot) {
       hydrateFromSnapshot(snapshot)
@@ -80,8 +82,9 @@ export default function App() {
           <RoiPanel open={roiOpen} />
           <DetailPanel open={detailOpen} onClose={() => setDetailOpen(false)} />
 
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[10px] opacity-70 text-center pointer-events-none anc-help-chip">
-            Click & drag to orbit · Scroll to zoom · Click LED zones to configure
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-center pointer-events-none anc-help-chip"
+            style={{ color: 'rgba(255,255,255,0.25)' }}>
+            Drag to orbit · Scroll to zoom · Click zones to edit
           </div>
         </div>
       )}

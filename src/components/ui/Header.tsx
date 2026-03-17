@@ -41,8 +41,8 @@ export function Header({
 
   const crowdOptions: { id: CrowdMode; label: string }[] = [
     { id: 'empty', label: 'Empty' },
-    { id: 'half', label: 'Half Full' },
-    { id: 'full', label: 'Packed' },
+    { id: 'half', label: 'Half' },
+    { id: 'full', label: 'Full' },
   ]
 
   const handleShare = () => {
@@ -53,91 +53,86 @@ export function Header({
     })
   }
 
-  const handleExport = () => window.print()
-
   return (
     <div className="absolute top-0 left-0 right-0 z-20 px-4 pt-3">
-      <div className="anc-topbar flex items-center justify-between gap-3 rounded-2xl px-4 py-3">
+      <div className="anc-topbar flex items-center justify-between gap-3 rounded-2xl px-4 py-2.5">
+        {/* Brand */}
         <div className="flex min-w-0 items-center gap-3">
-          <img src="/anc-logo-white.png" alt="ANC" className="h-8 object-contain" />
-          <div className="min-w-0">
-            <h1 className="text-sm font-bold uppercase" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: '15px', letterSpacing: '-0.045em' }}>
-              ANC VENUE VISION
+          <img src="/anc-logo-white.png" alt="ANC" className="h-7 object-contain" />
+          <div className="min-w-0 hidden sm:block">
+            <h1 className="text-sm font-bold uppercase" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: '14px', letterSpacing: '-0.045em' }}>
+              Venue Vision
             </h1>
-            <p className="text-[9px] uppercase" style={{ color: '#6888a8', fontFamily: "'Work Sans', sans-serif", letterSpacing: '0.1em' }}>
-              3D LED Configurator
-            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto">
+        <div className="flex items-center gap-1.5 overflow-x-auto">
+          {/* Venue + Scene controls */}
           <VenueSwitcher />
 
-          <div className="flex items-center gap-1 rounded-full border px-1 py-1 anc-chip-strip">
+          <div className="flex items-center gap-0.5 rounded-full border px-0.5 py-0.5 anc-chip-strip">
             {crowdOptions.map(option => (
               <button
                 key={option.id}
                 onClick={() => setCrowdMode(option.id)}
                 className={`anc-toolbar-button ${crowdMode === option.id ? 'anc-toolbar-button--active' : ''}`}
+                style={{ padding: '6px 8px', fontSize: '9px' }}
               >
                 {option.label}
               </button>
             ))}
           </div>
 
+          <span className="w-px h-4 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }} />
+
+          {/* Panel toggles */}
           <button onClick={onToggleZones} className={`anc-toolbar-button ${zonesOpen ? 'anc-toolbar-button--active' : ''}`}>
             Zones
           </button>
-
           <button onClick={onToggleInsights} className={`anc-toolbar-button ${insightsOpen ? 'anc-toolbar-button--active' : ''}`}>
             Revenue
           </button>
-
           <button onClick={onToggleRoi} className={`anc-toolbar-button ${roiOpen ? 'anc-toolbar-button--active' : ''}`}>
             ROI
           </button>
 
+          <span className="w-px h-4 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }} />
+
+          {/* Scene controls */}
           <button onClick={toggleSimulation} className={`anc-toolbar-button ${simulating ? 'anc-toolbar-button--accent' : ''}`}>
-            {simulating ? 'Stop Demo' : 'Auto Demo'}
+            {simulating ? 'Stop' : 'Demo'}
           </button>
-
           <button onClick={resetCamera} className="anc-toolbar-button">
-            Reset View
+            Reset
           </button>
 
-          <span className="w-px h-5 self-center" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          <span className="w-px h-4 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }} />
 
-          <button onClick={() => setSaveLoadOpen(true)} className="anc-toolbar-button">
-            Save/Load
-          </button>
-
-          <button onClick={handleExport} className="anc-toolbar-button">
-            Export
-          </button>
-
+          {/* Actions */}
+          <button onClick={() => setSaveLoadOpen(true)} className="anc-toolbar-button">Save</button>
+          <button onClick={() => window.print()} className="anc-toolbar-button">Export</button>
           <button onClick={handleShare} className={`anc-toolbar-button ${copied ? 'anc-toolbar-button--active' : ''}`}>
             {copied ? 'Copied!' : 'Share'}
           </button>
+          <button onClick={onOpenWizard} className="anc-toolbar-button">Setup</button>
 
-          <button onClick={onOpenWizard} className="anc-toolbar-button">
-            Guide
-          </button>
-
+          {/* Present — Primary CTA */}
           <button
             onClick={onPresent}
-            className="px-4 py-2 rounded-xl text-[10px] font-bold uppercase transition-all"
+            className="px-3.5 py-1.5 rounded-xl text-[9px] font-bold uppercase transition-all flex-shrink-0"
             style={{
               background: 'linear-gradient(135deg, #0A52EF, #03B8FF)',
               color: '#fff',
               fontFamily: "'Work Sans', sans-serif",
               letterSpacing: '0.05em',
-              boxShadow: '0 0 20px rgba(10,82,239,0.3)',
+              boxShadow: '0 0 16px rgba(10,82,239,0.25)',
             }}
           >
             Present
           </button>
 
-          <span className="anc-status-pill">
+          {/* Status */}
+          <span className="anc-status-pill flex-shrink-0" title={`${activeCount} of ${zones.length} zones active`}>
             {activeCount}/{zones.length}
           </span>
         </div>

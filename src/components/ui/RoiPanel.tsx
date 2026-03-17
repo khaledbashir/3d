@@ -46,18 +46,18 @@ export function RoiPanel({ open }: RoiPanelProps) {
         </div>
 
         <div className="flex flex-col gap-2">
-          <RoiInput label="Project Cost" value={inputs.projectCost} onChange={v => update('projectCost', v)} />
+          <RoiInput label="Total Investment" value={inputs.projectCost} onChange={v => update('projectCost', v)} />
           <RoiInput label="Venue Capacity" value={inputs.venueCapacity} onChange={v => update('venueCapacity', v)} prefix="#" />
-          <RoiInput label="Events / Year" value={inputs.eventsPerYear} onChange={v => update('eventsPerYear', v)} prefix="#" />
-          <RoiInput label="Ad CPM Rate" value={inputs.adCpmRate} onChange={v => update('adCpmRate', v)} />
+          <RoiInput label="Events per Year" value={inputs.eventsPerYear} onChange={v => update('eventsPerYear', v)} prefix="#" />
+          <RoiInput label="Ad Rate (CPM)" value={inputs.adCpmRate} onChange={v => update('adCpmRate', v)} />
           <RoiInput label="Sponsor Packages" value={inputs.sponsorPackages} onChange={v => update('sponsorPackages', v)} prefix="#" />
-          <RoiInput label="Avg Sponsor Rate" value={inputs.avgSponsorRate} onChange={v => update('avgSponsorRate', v)} />
+          <RoiInput label="Avg Package Price" value={inputs.avgSponsorRate} onChange={v => update('avgSponsorRate', v)} />
         </div>
       </div>
 
       <div className="anc-panel rounded-2xl p-4">
         <div className="text-[10px] uppercase tracking-[2px] mb-3" style={{ fontFamily: "'Work Sans', sans-serif", color: '#5a7a9a' }}>
-          Revenue Projection
+          Annual Revenue Projection
         </div>
 
         <div className="grid grid-cols-2 gap-2 mb-3">
@@ -78,8 +78,8 @@ export function RoiPanel({ open }: RoiPanelProps) {
 
         <div className="grid grid-cols-2 gap-2 mb-3">
           <div className="rounded-xl p-3" style={{ background: 'rgba(8,14,22,0.9)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div className="text-[9px] uppercase tracking-[1px] mb-1" style={{ color: '#5a7a9a' }}>Payback</div>
-            <div className="text-sm font-bold" style={{ color: results.paybackMonths <= 24 ? '#0A52EF' : '#ff6b6b' }}>
+            <div className="text-[9px] uppercase tracking-[1px] mb-1" style={{ color: '#5a7a9a' }}>Break-Even</div>
+            <div className="text-sm font-bold" style={{ color: results.paybackMonths <= 24 ? '#0A52EF' : results.paybackMonths <= 36 ? '#FFB020' : '#ff6b6b' }}>
               {results.paybackMonths} months
             </div>
           </div>

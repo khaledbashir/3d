@@ -237,9 +237,9 @@ export function VenueScene() {
       {/* Post-processing */}
       <EffectComposer>
         <Bloom
-          intensity={0.6}
-          luminanceThreshold={0.4}
-          luminanceSmoothing={0.9}
+          intensity={0.9}
+          luminanceThreshold={0.3}
+          luminanceSmoothing={0.85}
           mipmapBlur
         />
         <Vignette darkness={0.4} offset={0.3} />
