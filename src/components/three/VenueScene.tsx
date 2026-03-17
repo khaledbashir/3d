@@ -223,7 +223,7 @@ export function VenueScene() {
       {/* Environment map for realistic reflections */}
       <Environment preset="night" background={false} />
 
-      <fog attach="fog" args={['#000a1a', 150, 700]} />
+      <fog attach="fog" args={['#000a1a', 250, 900]} />
 
       <CameraController />
       <OrbitHandler />

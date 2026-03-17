@@ -27,14 +27,14 @@ export function LEDScreen({ zone }: LEDScreenProps) {
   return (
     <group position={zone.position} rotation={zone.rotation}>
       {/* Mounting bracket / frame */}
-      <mesh position={[0, 0, -0.3]}>
-        <boxGeometry args={[zone.width + 2, zone.height + 2, 0.5]} />
+      <mesh position={[0, 0, -0.2]}>
+        <boxGeometry args={[zone.width + 1, zone.height + 1, 0.3]} />
         <meshStandardMaterial color="#0a0a10" metalness={0.95} roughness={0.15} />
       </mesh>
 
       {/* LED bezel */}
-      <mesh position={[0, 0, -0.08]}>
-        <boxGeometry args={[zone.width + 0.8, zone.height + 0.8, 0.15]} />
+      <mesh position={[0, 0, -0.05]}>
+        <boxGeometry args={[zone.width + 0.4, zone.height + 0.4, 0.08]} />
         <meshStandardMaterial color="#111118" metalness={0.9} roughness={0.2} />
       </mesh>
 

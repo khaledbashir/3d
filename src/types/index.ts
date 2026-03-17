@@ -3,6 +3,7 @@ export type ContentType = 'logo' | 'ad' | 'score' | 'replay' | 'animation'
 export type ZoneType = 'videoboard' | 'ribbon' | 'fascia' | 'endzone' | 'stanchion' | 'courtside' | 'scoring' | 'totem' | 'wayfinding' | 'column'
 export type Environment = 'indoor' | 'outdoor' | 'both'
 export type CrowdMode = 'empty' | 'half' | 'full'
+export type LiveSyncTrigger = 'touchdown' | 'goal' | 'sponsor-takeover' | 'weather-alert' | 'timeout' | 'halftime-show' | 'emergency'
 
 export interface Product {
   id: string
@@ -78,4 +79,16 @@ export interface CabinetLayout {
   heatLoadBtu: number
   resolutionW: number
   resolutionH: number
+}
+
+export interface LiveGameData {
+  homeTeam: string
+  awayTeam: string
+  homeScore: number
+  awayScore: number
+  quarter: number
+  clock: string
+  down: string
+  weather: { temp: number; condition: string; icon: string }
+  betting: { spread: string; overUnder: number }
 }

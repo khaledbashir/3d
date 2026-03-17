@@ -6,6 +6,8 @@ import { ZonePanel } from '@/components/ui/ZonePanel'
 import { RevenuePanel } from '@/components/ui/RevenuePanel'
 import { DetailPanel } from '@/components/ui/DetailPanel'
 import { RoiPanel } from '@/components/ui/RoiPanel'
+import { LiveSyncPanel } from '@/components/ui/LiveSyncPanel'
+import { AnalyticsOverlay } from '@/components/ui/AnalyticsOverlay'
 import { SetupWizard } from '@/components/ui/SetupWizard'
 import { ExportSheet } from '@/components/ui/ExportSheet'
 import { PresentationMode } from '@/components/ui/PresentationMode'
@@ -17,9 +19,11 @@ export default function App() {
   const selectedZoneId = useVenueStore(s => s.selectedZoneId)
   const hydrateFromSnapshot = useVenueStore(s => s.hydrateFromSnapshot)
   const [zonesOpen, setZonesOpen] = useState(true)
-  const [insightsOpen, setInsightsOpen] = useState(true)
+  const [insightsOpen, setInsightsOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(true)
   const [roiOpen, setRoiOpen] = useState(false)
+  const [liveSyncOpen, setLiveSyncOpen] = useState(false)
+  const [analyticsOpen, setAnalyticsOpen] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(() => !localStorage.getItem('anc-wizard-seen'))
   const [presenting, setPresenting] = useState(false)
 
@@ -42,6 +46,30 @@ export default function App() {
   const handleCloseWizard = () => {
     setWizardOpen(false)
     localStorage.setItem('anc-wizard-seen', '1')
+  }
+
+  // Left panel logic: zones OR livesync
+  const handleToggleZones = () => {
+    setZonesOpen(o => !o)
+    if (!zonesOpen) setLiveSyncOpen(false)
+  }
+  const handleToggleLiveSync = () => {
+    setLiveSyncOpen(o => !o)
+    if (!liveSyncOpen) setZonesOpen(false)
+  }
+
+  // Right panel logic: revenue OR analytics OR roi
+  const handleToggleInsights = () => {
+    setInsightsOpen(o => !o)
+    if (!insightsOpen) { setRoiOpen(false); setAnalyticsOpen(false) }
+  }
+  const handleToggleAnalytics = () => {
+    setAnalyticsOpen(o => !o)
+    if (!analyticsOpen) { setInsightsOpen(false); setRoiOpen(false) }
+  }
+  const handleToggleRoi = () => {
+    setRoiOpen(o => !o)
+    if (!roiOpen) { setInsightsOpen(false); setAnalyticsOpen(false) }
   }
 
   return (
@@ -71,15 +99,27 @@ export default function App() {
             zonesOpen={zonesOpen}
             insightsOpen={insightsOpen}
             roiOpen={roiOpen}
-            onToggleZones={() => setZonesOpen(open => !open)}
-            onToggleInsights={() => { setInsightsOpen(open => !open); if (!insightsOpen) setRoiOpen(false) }}
-            onToggleRoi={() => { setRoiOpen(open => !open); if (!roiOpen) setInsightsOpen(false) }}
+            liveSyncOpen={liveSyncOpen}
+            analyticsOpen={analyticsOpen}
+            onToggleZones={handleToggleZones}
+            onToggleInsights={handleToggleInsights}
+            onToggleRoi={handleToggleRoi}
+            onToggleLiveSync={handleToggleLiveSync}
+            onToggleAnalytics={handleToggleAnalytics}
             onOpenWizard={() => setWizardOpen(true)}
             onPresent={() => setPresenting(true)}
           />
-          <ZonePanel open={zonesOpen} />
-          <RevenuePanel open={insightsOpen && !roiOpen} />
+
+          {/* Left panels */}
+          <ZonePanel open={zonesOpen && !liveSyncOpen} />
+          <LiveSyncPanel open={liveSyncOpen} />
+
+          {/* Right panels */}
+          <RevenuePanel open={insightsOpen && !roiOpen && !analyticsOpen} />
+          <AnalyticsOverlay open={analyticsOpen} />
           <RoiPanel open={roiOpen} />
+
+          {/* Bottom */}
           <DetailPanel open={detailOpen} onClose={() => setDetailOpen(false)} />
 
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-center pointer-events-none anc-help-chip"

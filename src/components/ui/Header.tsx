@@ -9,9 +9,13 @@ interface HeaderProps {
   zonesOpen: boolean
   insightsOpen: boolean
   roiOpen: boolean
+  liveSyncOpen: boolean
+  analyticsOpen: boolean
   onToggleZones: () => void
   onToggleInsights: () => void
   onToggleRoi: () => void
+  onToggleLiveSync: () => void
+  onToggleAnalytics: () => void
   onOpenWizard: () => void
   onPresent: () => void
 }
@@ -20,9 +24,13 @@ export function Header({
   zonesOpen,
   insightsOpen,
   roiOpen,
+  liveSyncOpen,
+  analyticsOpen,
   onToggleZones,
   onToggleInsights,
   onToggleRoi,
+  onToggleLiveSync,
+  onToggleAnalytics,
   onOpenWizard,
   onPresent,
 }: HeaderProps) {
@@ -41,8 +49,8 @@ export function Header({
 
   const crowdOptions: { id: CrowdMode; label: string }[] = [
     { id: 'empty', label: 'Empty' },
-    { id: 'half', label: 'Half' },
-    { id: 'full', label: 'Full' },
+    { id: 'half', label: 'Half Full' },
+    { id: 'full', label: 'Packed' },
   ]
 
   const handleShare = () => {
@@ -61,8 +69,11 @@ export function Header({
           <img src="/anc-logo-white.png" alt="ANC" className="h-7 object-contain" />
           <div className="min-w-0 hidden sm:block">
             <h1 className="text-sm font-bold uppercase" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: '14px', letterSpacing: '-0.045em' }}>
-              Venue Vision
+              ANC Venue Vision
             </h1>
+            <div className="text-[7px] uppercase tracking-widest" style={{ color: '#5a7a9a' }}>
+              3D LED Configurator
+            </div>
           </div>
         </div>
 
@@ -89,8 +100,14 @@ export function Header({
           <button onClick={onToggleZones} className={`anc-toolbar-button ${zonesOpen ? 'anc-toolbar-button--active' : ''}`}>
             Zones
           </button>
+          <button onClick={onToggleLiveSync} className={`anc-toolbar-button ${liveSyncOpen ? 'anc-toolbar-button--accent' : ''}`}>
+            LiveSync
+          </button>
           <button onClick={onToggleInsights} className={`anc-toolbar-button ${insightsOpen ? 'anc-toolbar-button--active' : ''}`}>
             Revenue
+          </button>
+          <button onClick={onToggleAnalytics} className={`anc-toolbar-button ${analyticsOpen ? 'anc-toolbar-button--active' : ''}`}>
+            Analytics
           </button>
           <button onClick={onToggleRoi} className={`anc-toolbar-button ${roiOpen ? 'anc-toolbar-button--active' : ''}`}>
             ROI
@@ -100,21 +117,20 @@ export function Header({
 
           {/* Scene controls */}
           <button onClick={toggleSimulation} className={`anc-toolbar-button ${simulating ? 'anc-toolbar-button--accent' : ''}`}>
-            {simulating ? 'Stop' : 'Demo'}
+            {simulating ? 'Stop' : 'Auto Demo'}
           </button>
           <button onClick={resetCamera} className="anc-toolbar-button">
-            Reset
+            Reset View
           </button>
 
           <span className="w-px h-4 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }} />
 
           {/* Actions */}
-          <button onClick={() => setSaveLoadOpen(true)} className="anc-toolbar-button">Save</button>
+          <button onClick={() => setSaveLoadOpen(true)} className="anc-toolbar-button">Save/Load</button>
           <button onClick={() => window.print()} className="anc-toolbar-button">Export</button>
           <button onClick={handleShare} className={`anc-toolbar-button ${copied ? 'anc-toolbar-button--active' : ''}`}>
             {copied ? 'Copied!' : 'Share'}
           </button>
-          <button onClick={onOpenWizard} className="anc-toolbar-button">Setup</button>
 
           {/* Present — Primary CTA */}
           <button

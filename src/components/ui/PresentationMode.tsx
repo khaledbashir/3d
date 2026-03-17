@@ -2,8 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useVenueStore } from '@/stores/venueStore'
 import { venues } from '@/data/venues'
-import { setClientLogoForRenderer } from '@/utils/ledRenderer'
-import type { VenueType } from '@/types'
+import { setClientLogoForRenderer, fireLiveSyncTrigger } from '@/utils/ledRenderer'
+import type { VenueType, LiveSyncTrigger } from '@/types'
 
 interface PresentationModeProps {
   active: boolean
@@ -55,6 +55,14 @@ const packages = [
   { id: 'premium' as const, label: 'Premium', description: 'Full venue coverage', color: '#0A52EF' },
 ]
 
+const liveSyncTriggers: { type: LiveSyncTrigger; label: string; color: string; key: string }[] = [
+  { type: 'touchdown', label: 'TD!', color: '#C8102E', key: 'T' },
+  { type: 'goal', label: 'GOAL', color: '#0066CC', key: 'G' },
+  { type: 'sponsor-takeover', label: 'SPONSOR', color: '#0A52EF', key: 'X' },
+  { type: 'timeout', label: 'T/O', color: '#5a7a9a', key: 'O' },
+  { type: 'halftime-show', label: 'SHOW', color: '#9333EA', key: 'H' },
+]
+
 export function PresentationMode({ active, onExit }: PresentationModeProps) {
   const venueType = useVenueStore(s => s.venueType)
   const setTargetCamera = useVenueStore(s => s.setTargetCamera)
@@ -62,6 +70,7 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
   const applyPackage = useVenueStore(s => s.applyPackage)
   const getRevenue = useVenueStore(s => s.getRevenue)
   const zones = useVenueStore(s => s.zones)
+  const sponsors = useVenueStore(s => s.sponsors)
   const setVenueType = useVenueStore(s => s.setVenueType)
   const clientLogo = useVenueStore(s => s.clientLogo)
   const clientName = useVenueStore(s => s.clientName)
@@ -75,6 +84,7 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
   const [flythrough, setFlythrough] = useState(false)
   const [showRevenue, setShowRevenue] = useState(true)
   const [showBranding, setShowBranding] = useState(false)
+  const [activeTrigger, setActiveTrigger] = useState<string | null>(null)
   const autoRotateRef = useRef<number>()
   const flythroughRef = useRef<{ shotIdx: number; timer: number }>({ shotIdx: 0, timer: 0 })
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -83,12 +93,10 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
   const shots = cameraShots[venueType] || cameraShots.nfl
   const activeCount = zones.filter(z => z.enabled).length
 
-  // Sync client logo with renderer
   useEffect(() => {
     setClientLogoForRenderer(clientLogo)
   }, [clientLogo])
 
-  // Auto-rotate
   useEffect(() => {
     if (!active || !autoRotate || flythrough) {
       if (autoRotateRef.current) cancelAnimationFrame(autoRotateRef.current)
@@ -104,14 +112,11 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
     return () => { if (autoRotateRef.current) cancelAnimationFrame(autoRotateRef.current) }
   }, [active, autoRotate, flythrough, setTargetCamera])
 
-  // Cinematic flythrough — auto-cycles through camera shots
   useEffect(() => {
     if (!active || !flythrough) return
     const ref = flythroughRef.current
     ref.shotIdx = 0
-    ref.timer = 0
 
-    // Start with first shot
     const shot = shots[0]
     if (shot) setTargetCamera(shot)
     setActiveShotIdx(0)
@@ -123,7 +128,7 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
         setTargetCamera(nextShot)
         setActiveShotIdx(ref.shotIdx)
       }
-    }, 5000) // 5 seconds per shot
+    }, 5000)
 
     return () => clearInterval(interval)
   }, [active, flythrough, shots, setTargetCamera])
@@ -149,6 +154,15 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
     if (shot) setTargetCamera(shot)
   }, [shots, setTargetCamera])
 
+  const handleTrigger = useCallback((type: LiveSyncTrigger) => {
+    if (activeTrigger) return
+    const sponsor = sponsors.find(s => s.id !== 'none')
+    fireLiveSyncTrigger(type, sponsor)
+    setActiveTrigger(type)
+    const duration = type === 'halftime-show' ? 10000 : type === 'sponsor-takeover' ? 8000 : 6000
+    setTimeout(() => setActiveTrigger(null), duration)
+  }, [activeTrigger, sponsors])
+
   const handleLogoUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !file.type.startsWith('image/')) return
@@ -160,7 +174,6 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
     reader.readAsDataURL(file)
   }, [setClientLogo])
 
-  // Keyboard shortcuts
   useEffect(() => {
     if (!active) return
     const onKey = (e: KeyboardEvent) => {
@@ -169,6 +182,9 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
       if (e.key === 's' || e.key === 'S') setShowRevenue(r => !r)
       if (e.key === 'f' || e.key === 'F') setFlythrough(f => !f)
       if (e.key === 'b' || e.key === 'B') setShowBranding(b => !b)
+      if (e.key === 't' || e.key === 'T') handleTrigger('touchdown')
+      if (e.key === 'g' || e.key === 'G') handleTrigger('goal')
+      if (e.key === 'x' || e.key === 'X') handleTrigger('sponsor-takeover')
       const num = parseInt(e.key)
       if (num >= 1 && num <= scenarios.length) handleScenario(scenarios[num - 1].id)
       if (e.key === 'ArrowRight') handleShot((activeShotIdx + 1) % shots.length)
@@ -176,7 +192,7 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [active, onExit, handleScenario, handleShot, activeShotIdx, shots.length])
+  }, [active, onExit, handleScenario, handleShot, handleTrigger, activeShotIdx, shots.length])
 
   if (!active) return null
 
@@ -195,7 +211,7 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
               <img src="/anc-logo-white.png" alt="ANC" className="h-7 object-contain opacity-80" />
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-white/80" style={{ fontFamily: "'Work Sans', sans-serif" }}>
-                  {clientName || 'Venue Vision'}
+                  {clientName || 'ANC Venue Vision'}
                 </div>
                 <div className="text-[9px] uppercase tracking-widest text-white/40">
                   {venues.find(v => v.id === venueType)?.name || 'Venue'}
@@ -342,8 +358,38 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
         {/* Bottom controls */}
         <motion.div initial={{ y: 80 }} animate={{ y: 0 }} className="absolute bottom-0 left-0 right-0 pointer-events-auto">
           <div className="flex items-end justify-between px-6 pb-5">
-            {/* Left: Scenarios + Packages */}
+            {/* Left: LiveSync triggers + Scenarios + Packages */}
             <div className="flex flex-col gap-2">
+              {/* LiveSync triggers — the showstopper */}
+              <div className="flex gap-1.5">
+                <div className="rounded-lg px-2 py-1.5 text-[7px] uppercase tracking-wider font-bold flex items-center"
+                  style={{ color: activeTrigger ? '#22C55E' : 'rgba(255,255,255,0.25)' }}>
+                  LiveSync
+                </div>
+                {liveSyncTriggers.map(t => (
+                  <button
+                    key={t.type}
+                    onClick={() => handleTrigger(t.type)}
+                    disabled={activeTrigger !== null}
+                    className="rounded-lg px-3 py-2 transition-all"
+                    style={{
+                      background: activeTrigger === t.type ? `${t.color}40` : 'rgba(0,5,15,0.6)',
+                      backdropFilter: 'blur(12px)',
+                      border: `1px solid ${activeTrigger === t.type ? `${t.color}70` : 'rgba(255,255,255,0.06)'}`,
+                      opacity: activeTrigger && activeTrigger !== t.type ? 0.3 : 1,
+                    }}
+                  >
+                    <div className="text-[10px] font-bold uppercase" style={{
+                      color: activeTrigger === t.type ? '#fff' : 'rgba(255,255,255,0.6)',
+                      fontFamily: "'Work Sans', sans-serif",
+                    }}>
+                      {t.label}
+                    </div>
+                    <div className="text-[6px] text-white/20 text-center mt-0.5">{t.key}</div>
+                  </button>
+                ))}
+              </div>
+
               {/* Package tiers */}
               <div className="flex gap-1.5">
                 {packages.map(pkg => (
@@ -411,7 +457,7 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
 
           <div className="text-center pb-2.5">
             <span className="text-[7px] text-white/12 tracking-wider">
-              1-5 Scenarios · Arrows Camera · F Tour · R Rotate · B Branding · S Revenue · ESC Exit
+              T Touchdown · G Goal · X Sponsor · 1-5 Scenarios · Arrows Camera · F Tour · R Rotate · B Branding · S Revenue · ESC Exit
             </span>
           </div>
         </motion.div>
