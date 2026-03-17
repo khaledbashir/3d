@@ -59,12 +59,13 @@ export function LEDScreen({ zone }: LEDScreenProps) {
         </mesh>
       )}
 
-      {/* LED Surface — emissive for bloom pickup */}
+      {/* LED Surface — immune to fog so screens stay bright at any distance */}
       <mesh ref={meshRef} onClick={handleClick}>
         <planeGeometry args={[zone.width, zone.height]} />
         <meshBasicMaterial
           map={texture}
           toneMapped={false}
+          fog={false}
         />
       </mesh>
     </group>
