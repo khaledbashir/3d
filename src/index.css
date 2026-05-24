@@ -91,6 +91,7 @@ canvas {
 .anc-detail-panel {
   background: rgba(10, 16, 24, 0.78);
   border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
 }
 
@@ -103,7 +104,7 @@ canvas {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(8, 14, 22, 0.78);
   color: #b0c4d8;
-  border-radius: 999px;
+  border-radius: 8px;
   padding: 8px 12px;
   font-size: 10px;
   cursor: pointer;
@@ -111,7 +112,7 @@ canvas {
   white-space: nowrap;
   font-family: 'Work Sans', sans-serif;
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -186,7 +187,7 @@ canvas {
 .anc-help-chip {
   background: rgba(8, 14, 22, 0.7);
   border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 999px;
+  border-radius: 8px;
   color: #6f88a0;
   padding: 8px 14px;
 }
@@ -202,8 +203,244 @@ canvas {
 .anc-field-card {
   border: 1px solid rgba(255,255,255,0.05);
   background: rgba(255,255,255,0.02);
-  border-radius: 18px;
+  border-radius: 8px;
   padding: 12px;
+}
+
+.anc-eyebrow {
+  color: #6f88a0;
+  font-family: 'Work Sans', system-ui, sans-serif;
+}
+
+.anc-muted {
+  color: #88a3bd;
+}
+
+.anc-panel.anc-guide-panel {
+  border-radius: 12px;
+  padding: 16px;
+  background:
+    linear-gradient(180deg, rgba(14, 24, 36, 0.88), rgba(7, 13, 20, 0.82)),
+    rgba(10, 16, 24, 0.84);
+}
+
+.anc-progress-bar {
+  background: linear-gradient(90deg, #0A52EF, #03B8FF);
+  box-shadow: 0 0 18px rgba(3, 184, 255, 0.35);
+  transition: width 300ms ease;
+}
+
+.anc-icon-button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.anc-icon-button:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.18);
+}
+
+.anc-floating-guide,
+.anc-primary-cta,
+.anc-secondary-cta,
+.anc-quiet-button,
+.anc-link-button,
+.anc-package-button {
+  font-family: 'Work Sans', system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.anc-floating-guide {
+  border: 1px solid rgba(3,184,255,0.24);
+  border-radius: 8px;
+  background: rgba(7, 13, 20, 0.78);
+  color: #d8ecff;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  backdrop-filter: blur(16px);
+}
+
+.anc-metric-tile {
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.035);
+  padding: 10px;
+}
+
+.anc-metric-tile span {
+  display: block;
+  color: #7894ae;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.anc-metric-tile strong {
+  display: block;
+  margin-top: 4px;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.anc-step-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255,255,255,0.055);
+  border-radius: 8px;
+  background: rgba(8, 14, 22, 0.72);
+  padding: 9px 10px;
+}
+
+.anc-step-dot {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.42);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.anc-step-dot--done {
+  background: rgba(10,82,239,0.24);
+  color: #d9ecff;
+  box-shadow: inset 0 0 0 1px rgba(3,184,255,0.25);
+}
+
+.anc-link-button {
+  border: 0;
+  background: transparent;
+  color: #8dcfff;
+}
+
+.anc-package-button {
+  min-height: 78px;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  background: rgba(8,14,22,0.78);
+  color: #fff;
+  padding: 9px 8px;
+  text-align: left;
+}
+
+.anc-package-button:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--package-tone) 55%, transparent);
+  background: color-mix(in oklab, var(--package-tone) 16%, rgba(8,14,22,0.85));
+}
+
+.anc-package-button span,
+.anc-package-button small {
+  display: block;
+}
+
+.anc-package-button span {
+  color: var(--package-tone);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.anc-package-button small {
+  margin-top: 5px;
+  color: rgba(218, 234, 248, 0.58);
+  font-size: 8px;
+  line-height: 1.3;
+}
+
+.anc-primary-cta,
+.anc-secondary-cta,
+.anc-quiet-button {
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.anc-primary-cta {
+  flex: 1;
+  border: 1px solid rgba(3,184,255,0.34);
+  background: linear-gradient(135deg, #0A52EF, #03B8FF);
+  color: #fff;
+  padding: 10px 12px;
+  box-shadow: 0 12px 28px rgba(10,82,239,0.22);
+}
+
+.anc-secondary-cta {
+  flex: 1;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.045);
+  color: #dcecff;
+  padding: 10px 12px;
+}
+
+.anc-quiet-button {
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.025);
+  color: #8aa5bf;
+  padding: 9px 12px;
+}
+
+.anc-wizard-card {
+  width: 520px;
+  max-width: calc(100vw - 24px);
+}
+
+@media (max-width: 640px) {
+  .anc-topbar {
+    max-height: 42vh;
+    overflow-y: auto;
+  }
+
+  .anc-wizard-card {
+    padding: 18px;
+  }
+
+  .anc-wizard-grid,
+  .anc-wizard-review-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .anc-wizard-nav {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .anc-wizard-nav button {
+    width: 100%;
+  }
+
+  .anc-guide-panel {
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+
+  .anc-floating-guide {
+    right: 12px;
+  }
+
+  .anc-detail-panel {
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 12px !important;
+    max-height: 46vh;
+    overflow-y: auto;
+  }
 }
 
 @media (max-width: 1280px) {

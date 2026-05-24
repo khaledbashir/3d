@@ -111,7 +111,7 @@ export function AnalyticsOverlay({ open }: AnalyticsOverlayProps) {
         {/* Impressions — hero metric */}
         <div className="rounded-xl p-4 mb-3" style={{ background: 'rgba(10,82,239,0.08)', border: '1px solid rgba(10,82,239,0.2)' }}>
           <div className="text-[8px] uppercase tracking-[2px] mb-1" style={{ color: '#5a7a9a' }}>Est. Impressions / Event</div>
-          <div className="text-3xl font-bold" style={{ fontFamily: "'Work Sans', sans-serif", color: '#fff', letterSpacing: '-0.03em' }}>
+          <div className="text-3xl font-bold" style={{ fontFamily: "'Work Sans', sans-serif", color: '#fff', letterSpacing: 0 }}>
             {fmt(displayImpressions)}
           </div>
           <div className="text-[9px] mt-1" style={{ color: '#4a6a8a' }}>

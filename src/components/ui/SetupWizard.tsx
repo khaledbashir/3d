@@ -34,7 +34,10 @@ export function SetupWizard({ open, onClose }: SetupWizardProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-md" />
-      <div className="relative w-[520px] max-h-[85vh] overflow-y-auto anc-panel rounded-2xl p-6">
+      <div
+        className="relative max-h-[calc(100vh-32px)] overflow-y-auto anc-panel p-6 anc-wizard-card"
+        style={{ width: 'calc(100vw - 24px)', maxWidth: 520 }}
+      >
         {/* Progress */}
         <div className="flex items-center justify-between mb-6">
           <div className="text-[9px] uppercase tracking-wider" style={{ color: '#5a7a9a' }}>
@@ -65,7 +68,7 @@ export function SetupWizard({ open, onClose }: SetupWizardProps) {
               <div>
                 <h2 className="text-lg font-bold mb-1" style={{ fontFamily: "'Work Sans', sans-serif" }}>Pick Your Venue</h2>
                 <p className="text-[11px] mb-4" style={{ color: '#6888a8' }}>What type of venue are you configuring?</p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 anc-wizard-grid">
                   {venues.map(v => {
                     const info = venueLabels[v.id]
                     return (
@@ -144,7 +147,7 @@ export function SetupWizard({ open, onClose }: SetupWizardProps) {
               <div>
                 <h2 className="text-lg font-bold mb-1" style={{ fontFamily: "'Work Sans', sans-serif" }}>Configuration Complete</h2>
                 <p className="text-[11px] mb-4" style={{ color: '#6888a8' }}>Here's your estimated revenue impact.</p>
-                <div className="grid grid-cols-3 gap-2 mb-4">
+                <div className="grid grid-cols-3 gap-2 mb-4 anc-wizard-review-grid">
                   <div className="rounded-xl p-3 text-center" style={{ background: 'rgba(8,14,22,0.9)', border: '1px solid rgba(255,255,255,0.06)' }}>
                     <div className="text-lg font-bold" style={{ color: '#0A52EF' }}>{revenue.activeCount}</div>
                     <div className="text-[9px] uppercase" style={{ color: '#5a7a9a' }}>Active Zones</div>
@@ -164,7 +167,7 @@ export function SetupWizard({ open, onClose }: SetupWizardProps) {
         </AnimatePresence>
 
         {/* Navigation */}
-        <div className="flex items-center justify-between mt-6 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex items-center justify-between gap-3 mt-6 pt-4 anc-wizard-nav" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           {step > 0 ? (
             <button onClick={() => setStep(s => s - 1)} className="anc-toolbar-button">Back</button>
           ) : (

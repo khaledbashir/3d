@@ -11,11 +11,13 @@ interface HeaderProps {
   roiOpen: boolean
   liveSyncOpen: boolean
   analyticsOpen: boolean
+  guideOpen: boolean
   onToggleZones: () => void
   onToggleInsights: () => void
   onToggleRoi: () => void
   onToggleLiveSync: () => void
   onToggleAnalytics: () => void
+  onToggleGuide: () => void
   onOpenWizard: () => void
   onPresent: () => void
 }
@@ -26,11 +28,13 @@ export function Header({
   roiOpen,
   liveSyncOpen,
   analyticsOpen,
+  guideOpen,
   onToggleZones,
   onToggleInsights,
   onToggleRoi,
   onToggleLiveSync,
   onToggleAnalytics,
+  onToggleGuide,
   onOpenWizard,
   onPresent,
 }: HeaderProps) {
@@ -63,12 +67,12 @@ export function Header({
 
   return (
     <div className="absolute top-0 left-0 right-0 z-20 px-4 pt-3">
-      <div className="anc-topbar flex items-center justify-between gap-3 rounded-2xl px-4 py-2.5">
+      <div className="anc-topbar flex items-center justify-between gap-3 rounded-xl px-4 py-2.5">
         {/* Brand */}
         <div className="flex min-w-0 items-center gap-3">
           <img src="/anc-logo-white.png" alt="ANC" className="h-7 object-contain" />
           <div className="min-w-0 hidden sm:block">
-            <h1 className="text-sm font-bold uppercase" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: '14px', letterSpacing: '-0.045em' }}>
+            <h1 className="text-sm font-bold uppercase" style={{ fontFamily: "'Work Sans', sans-serif", fontSize: '14px', letterSpacing: 0 }}>
               ANC Venue Vision
             </h1>
             <div className="text-[7px] uppercase tracking-widest" style={{ color: '#5a7a9a' }}>
@@ -97,6 +101,9 @@ export function Header({
           <span className="w-px h-4 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }} />
 
           {/* Panel toggles */}
+          <button onClick={onToggleGuide} className={`anc-toolbar-button ${guideOpen ? 'anc-toolbar-button--accent' : ''}`}>
+            Guide
+          </button>
           <button onClick={onToggleZones} className={`anc-toolbar-button ${zonesOpen ? 'anc-toolbar-button--active' : ''}`}>
             Zones
           </button>
@@ -126,7 +133,8 @@ export function Header({
           <span className="w-px h-4 flex-shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }} />
 
           {/* Actions */}
-          <button onClick={() => setSaveLoadOpen(true)} className="anc-toolbar-button">Save/Load</button>
+          <button onClick={onOpenWizard} className="anc-toolbar-button">Setup</button>
+          <button onClick={() => setSaveLoadOpen(true)} className="anc-toolbar-button">Save</button>
           <button onClick={() => window.print()} className="anc-toolbar-button">Export</button>
           <button onClick={handleShare} className={`anc-toolbar-button ${copied ? 'anc-toolbar-button--active' : ''}`}>
             {copied ? 'Copied!' : 'Share'}

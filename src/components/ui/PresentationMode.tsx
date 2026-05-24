@@ -336,7 +336,7 @@ export function PresentationMode({ active, onExit }: PresentationModeProps) {
                 background: 'rgba(0,5,15,0.7)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.06)',
               }}>
                 <div className="text-[8px] uppercase tracking-[3px] mb-2 text-white/30">Revenue Impact</div>
-                <div className="text-3xl font-bold text-white" style={{ fontFamily: "'Work Sans', sans-serif", letterSpacing: '-0.03em' }}>
+                <div className="text-3xl font-bold text-white" style={{ fontFamily: "'Work Sans', sans-serif", letterSpacing: 0 }}>
                   ${revenue.perSeason.toLocaleString()}
                 </div>
                 <div className="text-[10px] text-white/40 mt-0.5">per season · {activeCount} zones active</div>

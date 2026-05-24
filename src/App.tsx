@@ -11,6 +11,7 @@ import { AnalyticsOverlay } from '@/components/ui/AnalyticsOverlay'
 import { SetupWizard } from '@/components/ui/SetupWizard'
 import { ExportSheet } from '@/components/ui/ExportSheet'
 import { PresentationMode } from '@/components/ui/PresentationMode'
+import { GuidedPath } from '@/components/ui/GuidedPath'
 import { useVenueStore } from '@/stores/venueStore'
 import { decodeConfigFromUrl } from '@/utils/configUrl'
 import { preloadSponsorLogos } from '@/utils/preloadLogos'
@@ -20,10 +21,11 @@ export default function App() {
   const hydrateFromSnapshot = useVenueStore(s => s.hydrateFromSnapshot)
   const [zonesOpen, setZonesOpen] = useState(true)
   const [insightsOpen, setInsightsOpen] = useState(false)
-  const [detailOpen, setDetailOpen] = useState(true)
+  const [detailOpen, setDetailOpen] = useState(false)
   const [roiOpen, setRoiOpen] = useState(false)
   const [liveSyncOpen, setLiveSyncOpen] = useState(false)
   const [analyticsOpen, setAnalyticsOpen] = useState(false)
+  const [guideOpen, setGuideOpen] = useState(true)
   const [wizardOpen, setWizardOpen] = useState(() => !localStorage.getItem('anc-wizard-seen'))
   const [presenting, setPresenting] = useState(false)
 
@@ -62,14 +64,21 @@ export default function App() {
   const handleToggleInsights = () => {
     setInsightsOpen(o => !o)
     if (!insightsOpen) { setRoiOpen(false); setAnalyticsOpen(false) }
+    if (!insightsOpen) setGuideOpen(false)
   }
   const handleToggleAnalytics = () => {
     setAnalyticsOpen(o => !o)
     if (!analyticsOpen) { setInsightsOpen(false); setRoiOpen(false) }
+    if (!analyticsOpen) setGuideOpen(false)
   }
   const handleToggleRoi = () => {
     setRoiOpen(o => !o)
     if (!roiOpen) { setInsightsOpen(false); setAnalyticsOpen(false) }
+    if (!roiOpen) setGuideOpen(false)
+  }
+  const handleToggleGuide = () => {
+    setGuideOpen(o => !o)
+    if (!guideOpen) { setInsightsOpen(false); setRoiOpen(false); setAnalyticsOpen(false) }
   }
 
   return (
@@ -106,6 +115,8 @@ export default function App() {
             onToggleRoi={handleToggleRoi}
             onToggleLiveSync={handleToggleLiveSync}
             onToggleAnalytics={handleToggleAnalytics}
+            guideOpen={guideOpen}
+            onToggleGuide={handleToggleGuide}
             onOpenWizard={() => setWizardOpen(true)}
             onPresent={() => setPresenting(true)}
           />
@@ -118,6 +129,16 @@ export default function App() {
           <RevenuePanel open={insightsOpen && !roiOpen && !analyticsOpen} />
           <AnalyticsOverlay open={analyticsOpen} />
           <RoiPanel open={roiOpen} />
+
+          {!insightsOpen && !roiOpen && !analyticsOpen && (
+            <GuidedPath
+              open={guideOpen}
+              onClose={() => setGuideOpen(false)}
+              onReopen={() => setGuideOpen(true)}
+              onOpenWizard={() => setWizardOpen(true)}
+              onPresent={() => setPresenting(true)}
+            />
+          )}
 
           {/* Bottom */}
           <DetailPanel open={detailOpen} onClose={() => setDetailOpen(false)} />
