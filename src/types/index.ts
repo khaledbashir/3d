@@ -42,6 +42,8 @@ export interface LEDZone {
   rotation: [number, number, number]
   width: number
   height: number
+  /** When set, the screen renders as a cylindrical arc hugging the bowl. */
+  curveRadius?: number
   description: string
 }
 

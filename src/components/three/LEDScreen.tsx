@@ -1,5 +1,5 @@
-import { useRef } from 'react'
-import type { Mesh } from 'three'
+import { useMemo, useRef } from 'react'
+import { CylinderGeometry, type Mesh } from 'three'
 import { useLEDTexture } from '@/hooks/useLEDTexture'
 import { useVenueStore } from '@/stores/venueStore'
 import { getSponsor } from '@/data/sponsors'
@@ -7,6 +7,53 @@ import type { LEDZone } from '@/types'
 
 interface LEDScreenProps {
   zone: LEDZone
+}
+
+/** Open cylindrical arc centered on local origin, facing +z. */
+function useArcGeometry(width: number, height: number, radius: number, offset = 0, pad = 0) {
+  return useMemo(() => {
+    const r = radius + offset
+    const theta = (width + pad) / radius
+    const geo = new CylinderGeometry(r, r, height, 32, 1, true, -theta / 2, theta)
+    geo.translate(0, 0, -r)
+    return geo
+  }, [width, height, radius, offset, pad])
+}
+
+function CurvedScreen({ zone, texture, isSelected, onClick }: {
+  zone: LEDZone; texture: any; isSelected: boolean; onClick: (e: any) => void
+}) {
+  const radius = zone.curveRadius!
+  const screenGeo = useArcGeometry(zone.width, zone.height, radius)
+  const backingGeo = useArcGeometry(zone.width, zone.height + 0.6, radius, 0, 0.8)
+  const glowGeo = useArcGeometry(zone.width, zone.height + 2.4, radius, 0, 3)
+
+  return (
+    <group position={zone.position} rotation={zone.rotation}>
+      {/* Backing structure — follows the same arc, just behind */}
+      <mesh geometry={backingGeo} position={[0, 0, -0.35]}>
+        <meshStandardMaterial color="#0c0c12" metalness={0.9} roughness={0.25} />
+      </mesh>
+
+      {isSelected && (
+        <mesh geometry={glowGeo} position={[0, 0, -0.18]}>
+          <meshBasicMaterial color="#0A52EF" transparent opacity={0.16} />
+        </mesh>
+      )}
+
+      <mesh geometry={screenGeo} onClick={onClick}>
+        <meshBasicMaterial map={texture} toneMapped={false} fog={false} />
+      </mesh>
+
+      <pointLight
+        position={[0, 0, 5]}
+        color={zone.enabled ? '#3a66c8' : '#000000'}
+        intensity={zone.enabled ? 60 : 0}
+        distance={zone.width * 1.4}
+        decay={2}
+      />
+    </group>
+  )
 }
 
 export function LEDScreen({ zone }: LEDScreenProps) {
@@ -22,6 +69,10 @@ export function LEDScreen({ zone }: LEDScreenProps) {
   const handleClick = (e: any) => {
     e.stopPropagation()
     selectZone(isSelected ? null : zone.id)
+  }
+
+  if (zone.curveRadius) {
+    return <CurvedScreen zone={zone} texture={texture} isSelected={isSelected} onClick={handleClick} />
   }
 
   return (
@@ -42,8 +93,8 @@ export function LEDScreen({ zone }: LEDScreenProps) {
       <pointLight
         position={[0, 0, 4]}
         color={zone.enabled ? (sponsor.id !== 'none' ? sponsor.color : '#0A52EF') : '#000000'}
-        intensity={zone.enabled ? 1.2 : 0}
-        distance={zone.width * 2}
+        intensity={zone.enabled ? 90 : 0}
+        distance={zone.width * 1.6}
         decay={2}
       />
 

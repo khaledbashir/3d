@@ -13,7 +13,8 @@ interface CrowdSection {
   radiusZ: number
   startY: number
   rowRise: number
-  scaleZ: number
+  /** Radial distance between rows — matches the seating-tier rake. */
+  rowStep: number
 }
 
 interface CrowdProps {
@@ -55,9 +56,8 @@ export function Crowd({ density, sections }: CrowdProps) {
 
     sections.forEach((section, sectionIndex) => {
       for (let row = 0; row < section.rows; row++) {
-        const rowProgress = row / Math.max(section.rows - 1, 1)
-        const rowRadiusX = section.radiusX + row * 1.85
-        const rowRadiusZ = (section.radiusZ + row * 1.55) * section.scaleZ
+        const rowRadiusX = section.radiusX + row * section.rowStep
+        const rowRadiusZ = section.radiusZ + row * section.rowStep
         const y = section.startY + row * section.rowRise
         const seatCount = section.seatsPerRow + row * 2
 
@@ -152,11 +152,11 @@ export function Crowd({ density, sections }: CrowdProps) {
     <group>
       <instancedMesh ref={bodyRef} args={[undefined, undefined, crowd.length]} frustumCulled={false}>
         <capsuleGeometry args={[0.34, 0.72, 4, 6]} />
-        <meshStandardMaterial roughness={0.95} metalness={0.02} />
+        <meshStandardMaterial roughness={0.95} metalness={0.02} emissive="#1c2030" emissiveIntensity={0.5} />
       </instancedMesh>
       <instancedMesh ref={headRef} args={[undefined, undefined, crowd.length]} frustumCulled={false}>
         <sphereGeometry args={[0.5, 8, 8]} />
-        <meshStandardMaterial roughness={1} metalness={0} />
+        <meshStandardMaterial roughness={1} metalness={0} emissive="#241c18" emissiveIntensity={0.45} />
       </instancedMesh>
     </group>
   )

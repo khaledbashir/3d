@@ -10,6 +10,7 @@ import { Transit } from './Transit'
 import { LEDScreen } from './LEDScreen'
 import { Crowd } from './Crowd'
 import { Particles } from './Particles'
+import { SkyDome } from './SkyDome'
 
 function CameraController() {
   const { camera } = useThree()
@@ -127,16 +128,17 @@ function CrowdForVenue() {
 
   if (crowdMode === 'empty') return null
 
+  // Sections track the seating-tier rakes built in Stadium/Arena.
   switch (venueType) {
     case 'nfl':
       return <Crowd density={crowdMode} sections={[
-        { rows: 10, seatsPerRow: 72, radiusX: 90, radiusZ: 62, startY: 5, rowRise: 1.75, scaleZ: 0.69 },
-        { rows: 10, seatsPerRow: 84, radiusX: 107, radiusZ: 74, startY: 24, rowRise: 1.95, scaleZ: 0.72 },
+        { rows: 15, seatsPerRow: 130, radiusX: 94, radiusZ: 60, startY: 4.6, rowRise: 0.86, rowStep: 1.62 },
+        { rows: 13, seatsPerRow: 165, radiusX: 116, radiusZ: 82, startY: 23.3, rowRise: 1.12, rowStep: 1.57 },
       ]} />
     case 'nba':
       return <Crowd density={crowdMode} sections={[
-        { rows: 8, seatsPerRow: 54, radiusX: 31, radiusZ: 22, startY: 3, rowRise: 1.5, scaleZ: 0.68 },
-        { rows: 8, seatsPerRow: 66, radiusX: 44, radiusZ: 31, startY: 15, rowRise: 1.7, scaleZ: 0.71 },
+        { rows: 9, seatsPerRow: 85, radiusX: 38, radiusZ: 28, startY: 3.3, rowRise: 0.78, rowStep: 1.4 },
+        { rows: 8, seatsPerRow: 115, radiusX: 50, radiusZ: 40, startY: 14.6, rowRise: 1.09, rowStep: 1.44 },
       ]} />
     default:
       return null
@@ -177,53 +179,45 @@ function SimulationRunner() {
   return null
 }
 
+function EnvironmentForVenue() {
+  const venueType = useVenueStore(s => s.venueType)
+  return <SkyDome skyline={venueType === 'nfl'} />
+}
+
 export function VenueScene() {
   return (
     <>
-      {/* Lighting — multi-source for realism */}
-      <ambientLight color="#1a2540" intensity={0.4} />
+      {/* Base night ambience — venue components carry their own key lights */}
+      <ambientLight color="#27324c" intensity={0.5} />
 
-      {/* Main key light — warm overhead */}
+      {/* Moonlight — soft cool key with shadows */}
       <directionalLight
-        position={[80, 180, 60]}
-        intensity={1.2}
-        color="#fff5e8"
+        position={[120, 220, -90]}
+        intensity={0.4}
+        color="#b9c9e8"
         castShadow
-        shadow-mapSize={[4096, 4096]}
+        shadow-mapSize={[2048, 2048]}
         shadow-camera-near={1}
-        shadow-camera-far={500}
-        shadow-camera-left={-150}
-        shadow-camera-right={150}
-        shadow-camera-top={150}
-        shadow-camera-bottom={-150}
-        shadow-bias={-0.0002}
+        shadow-camera-far={600}
+        shadow-camera-left={-170}
+        shadow-camera-right={170}
+        shadow-camera-top={170}
+        shadow-camera-bottom={-170}
+        shadow-bias={-0.0003}
       />
 
-      {/* Fill light — cool blue from opposite side */}
-      <directionalLight
-        position={[-60, 100, -40]}
-        intensity={0.3}
-        color="#4488cc"
-      />
+      {/* Cool fill from the opposite side */}
+      <directionalLight position={[-80, 90, 60]} intensity={0.12} color="#5577aa" />
 
-      {/* Rim light — subtle backlight for depth */}
-      <directionalLight
-        position={[0, 50, -120]}
-        intensity={0.2}
-        color="#6688bb"
-      />
+      {/* Sky / ground bounce */}
+      <hemisphereLight color="#1b2942" groundColor="#06070c" intensity={0.4} />
 
-      {/* Ground bounce light */}
-      <hemisphereLight
-        color="#1a3050"
-        groundColor="#0a0a14"
-        intensity={0.3}
-      />
-
-      {/* Environment map for realistic reflections */}
+      {/* Environment map for reflections on glass, hardwood, metal */}
       <Environment preset="night" background={false} />
 
-      <fog attach="fog" args={['#000a1a', 250, 900]} />
+      <fog attach="fog" args={['#06090f', 300, 1200]} />
+
+      <EnvironmentForVenue />
 
       <CameraController />
       <OrbitHandler />
@@ -237,12 +231,12 @@ export function VenueScene() {
       {/* Post-processing */}
       <EffectComposer>
         <Bloom
-          intensity={0.9}
-          luminanceThreshold={0.3}
-          luminanceSmoothing={0.85}
+          intensity={0.7}
+          luminanceThreshold={0.45}
+          luminanceSmoothing={0.8}
           mipmapBlur
         />
-        <Vignette darkness={0.4} offset={0.3} />
+        <Vignette darkness={0.38} offset={0.3} />
       </EffectComposer>
     </>
   )
