@@ -93,7 +93,7 @@ export function AnalyticsOverlay({ open }: AnalyticsOverlayProps) {
     .slice(0, 5)
 
   return (
-    <div className="absolute right-4 flex flex-col gap-3 pb-3 overflow-y-auto"
+    <div className="absolute right-16 flex flex-col gap-3 pb-3 overflow-y-auto"
       style={{ top: '84px', width: '300px', maxHeight: 'calc(100vh - 160px)' }}>
 
       {/* Key Metrics */}

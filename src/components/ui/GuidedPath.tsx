@@ -52,7 +52,7 @@ export function GuidedPath({ open, onClose, onReopen, onOpenWizard, onPresent }:
     return (
       <button
         onClick={onReopen}
-        className="absolute right-4 top-[88px] z-20 anc-floating-guide"
+        className="absolute right-16 top-[88px] z-20 anc-floating-guide"
       >
         Guided setup
       </button>
@@ -60,7 +60,7 @@ export function GuidedPath({ open, onClose, onReopen, onOpenWizard, onPresent }:
   }
 
   return (
-    <div className="absolute right-4 top-[88px] z-20 w-[318px] max-w-[calc(100vw-32px)] anc-panel anc-guide-panel">
+    <div className="absolute right-16 top-[88px] z-20 w-[318px] max-w-[calc(100vw-32px)] anc-panel anc-guide-panel">
       <div className="flex items-start justify-between gap-3">
         <div>
           <div className="text-[10px] uppercase tracking-[2px] anc-eyebrow">Client Path</div>

@@ -15,7 +15,7 @@ export function RevenuePanel({ open }: RevenuePanelProps) {
   if (!open) return null
 
   return (
-    <div className="absolute right-4 flex flex-col gap-3 pb-3 overflow-y-auto"
+    <div className="absolute right-16 flex flex-col gap-3 pb-3 overflow-y-auto"
       style={{ top: '84px', width: '300px', maxHeight: 'calc(100vh - 160px)' }}>
 
       <div className="anc-panel rounded-2xl p-4">

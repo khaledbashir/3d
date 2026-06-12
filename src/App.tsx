@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { VenueScene } from '@/components/three/VenueScene'
 import { Header } from '@/components/ui/Header'
+import { ControlRail } from '@/components/ui/ControlRail'
 import { ZonePanel } from '@/components/ui/ZonePanel'
 import { RevenuePanel } from '@/components/ui/RevenuePanel'
 import { DetailPanel } from '@/components/ui/DetailPanel'
@@ -105,20 +106,23 @@ export default function App() {
       {!presenting && (
         <div className="absolute inset-0 z-10 pointer-events-none [&>*]:pointer-events-auto">
           <Header
+            onOpenWizard={() => setWizardOpen(true)}
+            onPresent={() => setPresenting(true)}
+          />
+
+          <ControlRail
             zonesOpen={zonesOpen}
             insightsOpen={insightsOpen}
             roiOpen={roiOpen}
             liveSyncOpen={liveSyncOpen}
             analyticsOpen={analyticsOpen}
+            guideOpen={guideOpen}
             onToggleZones={handleToggleZones}
             onToggleInsights={handleToggleInsights}
             onToggleRoi={handleToggleRoi}
             onToggleLiveSync={handleToggleLiveSync}
             onToggleAnalytics={handleToggleAnalytics}
-            guideOpen={guideOpen}
             onToggleGuide={handleToggleGuide}
-            onOpenWizard={() => setWizardOpen(true)}
-            onPresent={() => setPresenting(true)}
           />
 
           {/* Left panels */}

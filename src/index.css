@@ -140,6 +140,262 @@ canvas {
   padding: 7px 10px;
   font-size: 10px;
   white-space: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.anc-status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: #2dd4a7;
+  box-shadow: 0 0 8px rgba(45, 212, 167, 0.8);
+}
+
+/* ── Segmented controls (venue / crowd) ─────────────────────────── */
+.anc-seg {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(7, 12, 19, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.anc-seg-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: #6f88a0;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.anc-seg-button:hover {
+  color: #d6e6f7;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.anc-seg-button--active {
+  background: linear-gradient(135deg, rgba(10, 82, 239, 0.32), rgba(3, 184, 255, 0.18));
+  color: #eaf3ff;
+  box-shadow: inset 0 0 0 1px rgba(10, 82, 239, 0.45), 0 2px 10px rgba(10, 82, 239, 0.22);
+}
+
+.anc-seg-label {
+  font-family: 'Work Sans', sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding-right: 2px;
+}
+
+/* ── Icon buttons + overflow menu ───────────────────────────────── */
+.anc-icon-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 14, 22, 0.78);
+  color: #9fb4c8;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.anc-icon-button:hover {
+  color: #f4fbff;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.anc-icon-button--active {
+  background: rgba(10, 82, 239, 0.15);
+  color: #d0e4ff;
+  border-color: rgba(10, 82, 239, 0.35);
+}
+
+.anc-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 196px;
+  padding: 5px;
+  border-radius: 14px;
+  background: rgba(10, 16, 24, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  z-index: 50;
+}
+
+.anc-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #b8cbde;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 140ms ease;
+}
+
+.anc-menu-item:hover {
+  background: rgba(10, 82, 239, 0.16);
+  color: #eaf3ff;
+}
+
+/* ── Present CTA ────────────────────────────────────────────────── */
+.anc-present-button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #0a52ef, #03b8ff);
+  color: #fff;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(10, 82, 239, 0.35);
+  transition: all 180ms ease;
+}
+
+.anc-present-button:hover {
+  box-shadow: 0 6px 26px rgba(10, 82, 239, 0.55);
+  transform: translateY(-1px);
+}
+
+/* ── Right control rail ─────────────────────────────────────────── */
+.anc-rail {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 16px;
+  background: rgba(10, 16, 24, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  z-index: 25;
+}
+
+.anc-rail-divider {
+  width: 18px;
+  height: 1px;
+  margin: 3px 0;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.anc-rail-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  border: none;
+  background: transparent;
+  color: #6f88a0;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.anc-rail-button:hover {
+  color: #e6f1fc;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.anc-rail-button--active {
+  background: linear-gradient(135deg, rgba(10, 82, 239, 0.34), rgba(3, 184, 255, 0.2));
+  color: #eaf3ff;
+  box-shadow: inset 0 0 0 1px rgba(10, 82, 239, 0.45);
+}
+
+.anc-rail-button--active::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.5px;
+  height: 16px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #0a52ef, #03b8ff);
+}
+
+.anc-rail-button--live {
+  background: rgba(214, 69, 69, 0.18);
+  color: #ffb4b4;
+  box-shadow: inset 0 0 0 1px rgba(214, 69, 69, 0.4);
+}
+
+/* ── Tooltips (data-tip) ────────────────────────────────────────── */
+[data-tip] {
+  position: relative;
+}
+
+[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute;
+  white-space: nowrap;
+  padding: 5px 9px;
+  border-radius: 7px;
+  background: rgba(6, 10, 16, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #d6e6f7;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  z-index: 60;
+  top: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%);
+  animation: anc-tip-in 140ms ease both;
+}
+
+.anc-rail [data-tip]:hover::after {
+  top: 50%;
+  left: auto;
+  right: calc(100% + 11px);
+  transform: translateY(-50%);
+}
+
+@keyframes anc-tip-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .anc-mini-switch {

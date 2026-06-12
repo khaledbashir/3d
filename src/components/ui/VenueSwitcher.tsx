@@ -1,37 +1,43 @@
 import { useVenueStore } from '@/stores/venueStore'
 import { venues } from '@/data/venues'
 import type { VenueType } from '@/types'
+import { StadiumIcon, ArenaIcon, RetailIcon, TransitIcon } from './icons'
 
-const icons: Record<VenueType, string> = {
-  nfl: '🏈',
-  nba: '🏀',
-  mall: '🏬',
-  transit: '🚇',
+const icons: Record<VenueType, (size: number) => JSX.Element> = {
+  nfl: s => <StadiumIcon size={s} />,
+  nba: s => <ArenaIcon size={s} />,
+  mall: s => <RetailIcon size={s} />,
+  transit: s => <TransitIcon size={s} />,
 }
 
+const shortNames: Record<VenueType, string> = {
+  nfl: 'Stadium',
+  nba: 'Arena',
+  mall: 'Retail',
+  transit: 'Transit',
+}
+
+/** Segmented venue picker — active segment expands with its label. */
 export function VenueSwitcher() {
   const venueType = useVenueStore(s => s.venueType)
   const setVenueType = useVenueStore(s => s.setVenueType)
 
   return (
-    <div className="flex items-center gap-1 rounded-full border px-1 py-1 anc-chip-strip">
-      {venues.map(v => (
-        <button
-          key={v.id}
-          onClick={() => setVenueType(v.id)}
-          className="text-[10px] px-2.5 py-1 rounded-full border cursor-pointer transition-all whitespace-nowrap"
-          style={{
-            fontFamily: "'Work Sans', sans-serif",
-            ...(venueType === v.id
-              ? { background: 'rgba(10,82,239,0.14)', borderColor: 'rgba(10,82,239,0.24)', color: '#d0e4ff', fontWeight: 600 }
-              : { background: 'transparent', borderColor: 'transparent', color: '#7d93ab' }
-            ),
-          }}
-          title={v.description}
-        >
-          {icons[v.id]} {v.name}
-        </button>
-      ))}
+    <div className="anc-seg">
+      {venues.map(v => {
+        const active = venueType === v.id
+        return (
+          <button
+            key={v.id}
+            onClick={() => setVenueType(v.id)}
+            data-tip={active ? undefined : v.name}
+            className={`anc-seg-button ${active ? 'anc-seg-button--active' : ''}`}
+          >
+            {icons[v.id](15)}
+            {active && <span className="anc-seg-label">{shortNames[v.id]}</span>}
+          </button>
+        )
+      })}
     </div>
   )
 }
