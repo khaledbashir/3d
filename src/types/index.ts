@@ -3,6 +3,7 @@ export type ContentType = 'logo' | 'ad' | 'score' | 'replay' | 'animation'
 export type ZoneType = 'videoboard' | 'ribbon' | 'fascia' | 'endzone' | 'stanchion' | 'courtside' | 'scoring' | 'totem' | 'wayfinding' | 'column'
 export type Environment = 'indoor' | 'outdoor' | 'both'
 export type CrowdMode = 'empty' | 'half' | 'full'
+export type NavigationMode = 'orbit' | 'walk'
 export type LiveSyncTrigger = 'touchdown' | 'goal' | 'sponsor-takeover' | 'weather-alert' | 'timeout' | 'halftime-show' | 'emergency'
 
 export interface Product {
@@ -44,6 +45,10 @@ export interface LEDZone {
   height: number
   /** When set, the screen renders as a cylindrical arc hugging the bowl. */
   curveRadius?: number
+  /** Session-local client creative displayed on the LED surface. */
+  mediaUrl?: string
+  mediaKind?: 'image' | 'video'
+  mediaName?: string
   description: string
 }
 

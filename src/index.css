@@ -418,6 +418,27 @@ canvas {
   transition: transform 160ms ease;
 }
 
+.anc-inline-upload,
+.anc-inline-clear {
+  border: 0;
+  background: transparent;
+  color: #66a8ff;
+  font-family: 'Work Sans', sans-serif;
+  font-size: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.anc-inline-upload:hover,
+.anc-inline-clear:hover {
+  color: #b9ddff;
+}
+
+.anc-inline-clear {
+  color: #7a8da1;
+}
+
 .anc-mini-switch--on {
   background: rgba(10,82,239,0.2);
   border-color: rgba(10,82,239,0.35);

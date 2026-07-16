@@ -33,9 +33,15 @@ export function Header({ onOpenWizard, onPresent }: HeaderProps) {
   const [copied, setCopied] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const modelInputRef = useRef<HTMLInputElement>(null)
 
   const venueType = useVenueStore(s => s.venueType)
   const sponsors = useVenueStore(s => s.sponsors)
+  const navigationMode = useVenueStore(s => s.navigationMode)
+  const setNavigationMode = useVenueStore(s => s.setNavigationMode)
+  const venueModelUrl = useVenueStore(s => s.venueModelUrl)
+  const venueModelName = useVenueStore(s => s.venueModelName)
+  const setVenueModel = useVenueStore(s => s.setVenueModel)
 
   useEffect(() => {
     if (!menuOpen) return
@@ -60,12 +66,35 @@ export function Header({ onOpenWizard, onPresent }: HeaderProps) {
     })
   }
 
+  const releaseVenueModel = () => {
+    if (venueModelUrl?.startsWith('blob:')) URL.revokeObjectURL(venueModelUrl)
+    setVenueModel(null)
+  }
+
+  const handleVenueModelUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    if (!file.name.toLowerCase().endsWith('.glb')) {
+      window.alert('Please upload a self-contained .glb venue model.')
+      return
+    }
+    if (file.size > 250 * 1024 * 1024) {
+      window.alert('This GLB is over 250 MB. Optimize it for the web before importing.')
+      return
+    }
+    if (venueModelUrl?.startsWith('blob:')) URL.revokeObjectURL(venueModelUrl)
+    setVenueModel(URL.createObjectURL(file), file.name)
+    setMenuOpen(false)
+  }
+
   const menuItems = [
     { label: 'Setup wizard', icon: <SetupIcon size={15} />, onClick: () => { setMenuOpen(false); onOpenWizard() } },
     { label: 'Save / load configs', icon: <SaveIcon size={15} />, onClick: () => { setMenuOpen(false); setSaveLoadOpen(true) } },
     { label: 'Export one-pager', icon: <ExportIcon size={15} />, onClick: () => { setMenuOpen(false); window.print() } },
     { label: copied ? 'Link copied' : 'Copy share link', icon: copied ? <CheckIcon size={15} /> : <ShareIcon size={15} />, onClick: handleShare },
     { label: 'Reset camera', icon: <ResetIcon size={15} />, onClick: () => { setMenuOpen(false); resetCamera() } },
+    { label: 'Upload venue GLB', icon: <SetupIcon size={15} />, onClick: () => modelInputRef.current?.click() },
   ]
 
   return (
@@ -87,6 +116,22 @@ export function Header({ onOpenWizard, onPresent }: HeaderProps) {
         {/* Center — the two scene decisions: where, and how full */}
         <div className="flex items-center gap-2.5">
           <VenueSwitcher />
+          <div className="anc-seg" aria-label="Navigation mode">
+            <button
+              onClick={() => setNavigationMode('orbit')}
+              className={`anc-seg-button ${navigationMode === 'orbit' ? 'anc-seg-button--active' : ''}`}
+              data-tip="Orbit the full venue"
+            >
+              <span className="anc-seg-label">Orbit</span>
+            </button>
+            <button
+              onClick={() => setNavigationMode('walk')}
+              className={`anc-seg-button ${navigationMode === 'walk' ? 'anc-seg-button--active' : ''}`}
+              data-tip="Walk at event level"
+            >
+              <span className="anc-seg-label">Walk</span>
+            </button>
+          </div>
           <div className="anc-seg">
             {crowdOptions.map(option => (
               <button
@@ -124,6 +169,12 @@ export function Header({ onOpenWizard, onPresent }: HeaderProps) {
                     <span>{item.label}</span>
                   </button>
                 ))}
+                {venueModelUrl && (
+                  <button onClick={() => { releaseVenueModel(); setMenuOpen(false) }} className="anc-menu-item">
+                    <ResetIcon size={15} />
+                    <span>Remove {venueModelName ?? 'venue model'}</span>
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -134,6 +185,14 @@ export function Header({ onOpenWizard, onPresent }: HeaderProps) {
           </button>
         </div>
       </div>
+
+      <input
+        ref={modelInputRef}
+        type="file"
+        accept=".glb,model/gltf-binary"
+        className="hidden"
+        onChange={handleVenueModelUpload}
+      />
 
       <SaveLoadModal open={saveLoadOpen} onClose={() => setSaveLoadOpen(false)} />
     </div>

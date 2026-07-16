@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react'
 import { CylinderGeometry, type Mesh } from 'three'
 import { useLEDTexture } from '@/hooks/useLEDTexture'
+import { useZoneMediaTexture } from '@/hooks/useZoneMediaTexture'
 import { useVenueStore } from '@/stores/venueStore'
 import { getSponsor } from '@/data/sponsors'
 import type { LEDZone } from '@/types'
@@ -64,7 +65,9 @@ export function LEDScreen({ zone }: LEDScreenProps) {
 
   const sponsor = sponsors.find(s => s.id === zone.sponsor) ?? getSponsor('none')
   const isSelected = selectedZoneId === zone.id
-  const texture = useLEDTexture(zone.width, zone.height, zone.content, sponsor, isSelected, zone.enabled)
+  const generatedTexture = useLEDTexture(zone.width, zone.height, zone.content, sponsor, isSelected, zone.enabled)
+  const uploadedTexture = useZoneMediaTexture(zone.mediaUrl, zone.mediaKind)
+  const texture = zone.enabled && uploadedTexture ? uploadedTexture : generatedTexture
 
   const handleClick = (e: any) => {
     e.stopPropagation()

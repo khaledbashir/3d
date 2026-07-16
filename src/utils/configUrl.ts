@@ -10,7 +10,13 @@ export interface ConfigSnapshot {
 const validVenueTypes = ['nfl', 'nba', 'mall', 'transit']
 
 export function encodeConfigToUrl(snapshot: ConfigSnapshot): string {
-  const json = JSON.stringify(snapshot)
+  // Blob URLs are browser-session handles and cannot be shared. Keep the
+  // deterministic zone configuration while excluding local uploaded media.
+  const shareable = {
+    ...snapshot,
+    zones: snapshot.zones.map(({ mediaUrl: _mediaUrl, mediaKind: _mediaKind, mediaName: _mediaName, ...zone }) => zone),
+  }
+  const json = JSON.stringify(shareable)
   const compressed = compressToEncodedURIComponent(json)
   return `${window.location.origin}${window.location.pathname}#config=${compressed}`
 }

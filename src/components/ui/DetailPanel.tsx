@@ -27,6 +27,7 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
   const setZoneSponsor = useVenueStore(s => s.setZoneSponsor)
   const setZoneContent = useVenueStore(s => s.setZoneContent)
   const setZoneProduct = useVenueStore(s => s.setZoneProduct)
+  const setZoneMedia = useVenueStore(s => s.setZoneMedia)
   const venueType = useVenueStore(s => s.venueType)
   const [browserOpen, setBrowserOpen] = useState(false)
   const [showSpecs, setShowSpecs] = useState(false)
@@ -68,6 +69,20 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
   const envFilter = venueType === 'nfl' ? 'outdoor' : 'indoor'
   const currentProduct = products.find(p => p.id === zone.product)
   const cabinet = currentProduct ? calculateCabinetLayout(zone.width, zone.height, currentProduct) : null
+
+  const handleMediaUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    const kind = file.type.startsWith('video/') ? 'video' : 'image'
+    if (zone.mediaUrl?.startsWith('blob:')) URL.revokeObjectURL(zone.mediaUrl)
+    setZoneMedia(zone.id, { url: URL.createObjectURL(file), kind, name: file.name })
+  }
+
+  const clearMedia = () => {
+    if (zone.mediaUrl?.startsWith('blob:')) URL.revokeObjectURL(zone.mediaUrl)
+    setZoneMedia(zone.id, null)
+  }
 
   return (
     <div className="absolute bottom-4 rounded-[20px] p-4 anc-detail-panel" style={{ left: '320px', right: '320px' }}>
@@ -112,6 +127,25 @@ export function DetailPanel({ open, onClose }: DetailPanelProps) {
           <select value={zone.content} onChange={e => setZoneContent(zone.id, e.target.value as ContentType)} style={selectStyle}>
             {contentOptions.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
           </select>
+          <div className="mt-1 flex items-center gap-2">
+            <label className="anc-inline-upload">
+              <input
+                type="file"
+                accept="video/mp4,video/webm,image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={handleMediaUpload}
+              />
+              {zone.mediaName ? 'Replace media' : 'Upload MP4 / image'}
+            </label>
+            {zone.mediaName && (
+              <button className="anc-inline-clear" onClick={clearMedia}>Clear</button>
+            )}
+          </div>
+          {zone.mediaName && (
+            <div className="text-[8px] mt-1 truncate" style={{ color: '#7ea4c7' }} title={zone.mediaName}>
+              Live on LED · {zone.mediaName}
+            </div>
+          )}
         </div>
 
         <div className="anc-field-card">

@@ -20,6 +20,7 @@ import { preloadSponsorLogos } from '@/utils/preloadLogos'
 export default function App() {
   const selectedZoneId = useVenueStore(s => s.selectedZoneId)
   const hydrateFromSnapshot = useVenueStore(s => s.hydrateFromSnapshot)
+  const navigationMode = useVenueStore(s => s.navigationMode)
   const [zonesOpen, setZonesOpen] = useState(true)
   const [insightsOpen, setInsightsOpen] = useState(false)
   const [detailOpen, setDetailOpen] = useState(false)
@@ -149,7 +150,9 @@ export default function App() {
 
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-[9px] text-center pointer-events-none anc-help-chip"
             style={{ color: 'rgba(255,255,255,0.25)' }}>
-            Drag to orbit · Scroll to zoom · Click zones to edit
+            {navigationMode === 'walk'
+              ? 'Click the venue to look · WASD / arrows to walk · Esc to release'
+              : 'Drag to orbit · Scroll to zoom · Click zones to edit'}
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { VenueType, LEDZone, ContentType, CameraState, Sponsor, CrowdMode, SavedConfig } from '@/types'
+import type { VenueType, LEDZone, ContentType, CameraState, Sponsor, CrowdMode, SavedConfig, NavigationMode } from '@/types'
 import { getVenue } from '@/data/venues'
 import { sponsors as defaultSponsors } from '@/data/sponsors'
 import { presets } from '@/data/presets'
@@ -21,12 +21,22 @@ interface VenueStore {
   setZoneContent: (id: string, content: ContentType) => void
   setZoneProduct: (id: string, productId: string) => void
   setZoneEnabled: (id: string, enabled: boolean) => void
+  setZoneMedia: (id: string, media: { url: string; kind: 'image' | 'video'; name: string } | null) => void
 
   // Camera
   camera: CameraState
   targetCamera: CameraState
   setTargetCamera: (cam: Partial<CameraState>) => void
   resetCamera: () => void
+
+  // Navigation
+  navigationMode: NavigationMode
+  setNavigationMode: (mode: NavigationMode) => void
+
+  // Session-local authored venue model
+  venueModelUrl: string | null
+  venueModelName: string | null
+  setVenueModel: (url: string | null, name?: string | null) => void
 
   // Simulation
   simulating: boolean
@@ -107,6 +117,15 @@ export const useVenueStore = create<VenueStore>()(
         zones: state.zones.map(z => z.id === id ? { ...z, enabled } : z),
       })),
 
+      setZoneMedia: (id, media) => set(state => ({
+        zones: state.zones.map(z => z.id === id ? {
+          ...z,
+          mediaUrl: media?.url,
+          mediaKind: media?.kind,
+          mediaName: media?.name,
+        } : z),
+      })),
+
       camera: { ...initialVenue.cameraDefault },
       targetCamera: { ...initialVenue.cameraDefault },
       setTargetCamera: (cam) => set(state => ({
@@ -116,6 +135,16 @@ export const useVenueStore = create<VenueStore>()(
         const venue = getVenue(get().venueType)
         set({ targetCamera: { ...venue.cameraDefault } })
       },
+
+      navigationMode: 'orbit',
+      setNavigationMode: (mode) => {
+        if (mode === 'orbit' && document.pointerLockElement) document.exitPointerLock()
+        set({ navigationMode: mode })
+      },
+
+      venueModelUrl: null,
+      venueModelName: null,
+      setVenueModel: (url, name = null) => set({ venueModelUrl: url, venueModelName: name }),
 
       simulating: false,
       toggleSimulation: () => set(state => ({ simulating: !state.simulating })),

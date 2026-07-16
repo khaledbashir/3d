@@ -1,7 +1,8 @@
-import { useRef, useEffect } from 'react'
+import { Suspense, useRef, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Environment } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
+import { Euler, Vector3 } from 'three'
 import { useVenueStore } from '@/stores/venueStore'
 import { Stadium } from './Stadium'
 import { Arena } from './Arena'
@@ -11,14 +12,17 @@ import { LEDScreen } from './LEDScreen'
 import { Crowd } from './Crowd'
 import { Particles } from './Particles'
 import { SkyDome } from './SkyDome'
+import { ImportedVenueModel } from './ImportedVenueModel'
 
 function CameraController() {
   const { camera } = useThree()
   const targetCamera = useVenueStore(s => s.targetCamera)
+  const navigationMode = useVenueStore(s => s.navigationMode)
 
   const current = useRef({ angle: targetCamera.angle, pitch: targetCamera.pitch, distance: targetCamera.distance })
 
   useFrame(() => {
+    if (navigationMode !== 'orbit') return
     const t = current.current
     t.angle += (targetCamera.angle - t.angle) * 0.06
     t.pitch += (targetCamera.pitch - t.pitch) * 0.06
@@ -36,11 +40,13 @@ function CameraController() {
 function OrbitHandler() {
   const { gl } = useThree()
   const setTargetCamera = useVenueStore(s => s.setTargetCamera)
+  const navigationMode = useVenueStore(s => s.navigationMode)
 
   const isDragging = useRef(false)
   const lastMouse = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
+    if (navigationMode !== 'orbit') return
     const el = gl.domElement
 
     const onMouseDown = (e: MouseEvent) => {
@@ -105,13 +111,100 @@ function OrbitHandler() {
       window.removeEventListener('touchend', onTouchEnd)
       window.removeEventListener('touchmove', onTouchMove)
     }
-  }, [gl, setTargetCamera])
+  }, [gl, setTargetCamera, navigationMode])
+
+  return null
+}
+
+const WALK_SETTINGS = {
+  nfl: { spawn: [0, 2.1, 24] as const, bounds: [88, 51] as const, speed: 28 },
+  nba: { spawn: [0, 1.8, 10] as const, bounds: [32, 23] as const, speed: 13 },
+  mall: { spawn: [0, 1.8, 12] as const, bounds: [38, 34] as const, speed: 11 },
+  transit: { spawn: [0, 1.8, 12] as const, bounds: [42, 28] as const, speed: 12 },
+}
+
+function WalkController() {
+  const { camera, gl } = useThree()
+  const navigationMode = useVenueStore(s => s.navigationMode)
+  const venueType = useVenueStore(s => s.venueType)
+  const keys = useRef(new Set<string>())
+  const yaw = useRef(0)
+  const pitch = useRef(-0.04)
+  const forward = useRef(new Vector3())
+  const right = useRef(new Vector3())
+  const rotation = useRef(new Euler(0, 0, 0, 'YXZ'))
+
+  useEffect(() => {
+    if (navigationMode !== 'walk') return
+    const el = gl.domElement
+    const settings = WALK_SETTINGS[venueType]
+    camera.position.set(settings.spawn[0], settings.spawn[1], settings.spawn[2])
+    yaw.current = 0
+    pitch.current = -0.04
+
+    const onCanvasClick = () => {
+      if (document.pointerLockElement !== el) void el.requestPointerLock()
+    }
+    const onKeyDown = (event: KeyboardEvent) => keys.current.add(event.code)
+    const onKeyUp = (event: KeyboardEvent) => keys.current.delete(event.code)
+    const onMouseMove = (event: MouseEvent) => {
+      if (document.pointerLockElement !== el) return
+      yaw.current -= event.movementX * 0.002
+      pitch.current = Math.max(-1.35, Math.min(1.35, pitch.current - event.movementY * 0.002))
+    }
+
+    el.addEventListener('click', onCanvasClick)
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('keyup', onKeyUp)
+    document.addEventListener('mousemove', onMouseMove)
+
+    return () => {
+      keys.current.clear()
+      el.removeEventListener('click', onCanvasClick)
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('keyup', onKeyUp)
+      document.removeEventListener('mousemove', onMouseMove)
+      if (document.pointerLockElement === el) document.exitPointerLock()
+    }
+  }, [camera, gl, navigationMode, venueType])
+
+  useFrame((_, delta) => {
+    if (navigationMode !== 'walk') return
+    const settings = WALK_SETTINGS[venueType]
+    const step = settings.speed * Math.min(delta, 0.05)
+    const keyState = keys.current
+    const forwardAmount = Number(keyState.has('KeyW') || keyState.has('ArrowUp')) - Number(keyState.has('KeyS') || keyState.has('ArrowDown'))
+    const rightAmount = Number(keyState.has('KeyD') || keyState.has('ArrowRight')) - Number(keyState.has('KeyA') || keyState.has('ArrowLeft'))
+
+    rotation.current.set(pitch.current, yaw.current, 0)
+    camera.rotation.copy(rotation.current)
+
+    if (forwardAmount || rightAmount) {
+      forward.current.set(0, 0, -1).applyEuler(rotation.current).setY(0).normalize()
+      right.current.set(1, 0, 0).applyEuler(rotation.current).setY(0).normalize()
+      camera.position.addScaledVector(forward.current, forwardAmount * step)
+      camera.position.addScaledVector(right.current, rightAmount * step)
+    }
+
+    camera.position.x = Math.max(-settings.bounds[0], Math.min(settings.bounds[0], camera.position.x))
+    camera.position.z = Math.max(-settings.bounds[1], Math.min(settings.bounds[1], camera.position.z))
+    camera.position.y = settings.spawn[1]
+  })
 
   return null
 }
 
 function VenueGeometry() {
   const venueType = useVenueStore(s => s.venueType)
+  const venueModelUrl = useVenueStore(s => s.venueModelUrl)
+
+  if (venueModelUrl) {
+    return (
+      <Suspense fallback={null}>
+        <ImportedVenueModel url={venueModelUrl} venueType={venueType} />
+      </Suspense>
+    )
+  }
 
   switch (venueType) {
     case 'nfl': return <Stadium />
@@ -221,6 +314,7 @@ export function VenueScene() {
 
       <CameraController />
       <OrbitHandler />
+      <WalkController />
       <SimulationRunner />
 
       <VenueGeometry />
