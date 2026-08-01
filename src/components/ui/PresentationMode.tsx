@@ -42,9 +42,9 @@ const cameraShots: Record<string, { angle: number; pitch: number; distance: numb
 }
 
 const scenarios = [
-  { id: 'gameday', label: 'Game Day', preset: 'scores', description: 'Live scores on all displays' },
-  { id: 'sponsors', label: 'Sponsors', preset: 'logos', description: 'Sponsor logos front and center' },
-  { id: 'halftime', label: 'Halftime', preset: 'halftime', description: 'Dynamic energy and animations' },
+  { id: 'gameday', label: 'Live Game', preset: 'scores', description: 'Broadcast score with timed campaign breaks' },
+  { id: 'sponsors', label: 'Campaign Takeover', preset: 'logos', description: 'Synchronized creative on every active screen' },
+  { id: 'halftime', label: 'Brand Film', preset: 'halftime', description: 'Full-venue cinematic sponsor moment' },
   { id: 'dark', label: 'Before', preset: 'alloff', description: 'Venue without LED screens' },
   { id: 'full', label: 'Full Build', preset: 'allon', description: 'Every zone active' },
 ]

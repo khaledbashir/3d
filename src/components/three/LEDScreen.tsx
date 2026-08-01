@@ -4,6 +4,7 @@ import { useLEDTexture } from '@/hooks/useLEDTexture'
 import { useZoneMediaTexture } from '@/hooks/useZoneMediaTexture'
 import { useVenueStore } from '@/stores/venueStore'
 import { getSponsor } from '@/data/sponsors'
+import { getProduct } from '@/data/products'
 import type { LEDZone } from '@/types'
 
 interface LEDScreenProps {
@@ -65,7 +66,19 @@ export function LEDScreen({ zone }: LEDScreenProps) {
 
   const sponsor = sponsors.find(s => s.id === zone.sponsor) ?? getSponsor('none')
   const isSelected = selectedZoneId === zone.id
-  const generatedTexture = useLEDTexture(zone.width, zone.height, zone.content, sponsor, isSelected, zone.enabled)
+
+  // The specified product drives both the pixel mask and how hard the wall
+  // blooms, so a 2.9mm indoor courtside table does not read like an 8mm
+  // outdoor fascia.
+  const product = getProduct(zone.product)
+  const surface = useMemo(() => ({
+    widthFt: zone.width,
+    heightFt: zone.height,
+    pixelPitchMm: product?.pixelPitch,
+    outdoor: product?.environment === 'outdoor',
+  }), [zone.width, zone.height, product?.pixelPitch, product?.environment])
+
+  const generatedTexture = useLEDTexture(surface, zone.content, sponsor, isSelected, zone.enabled)
   const uploadedTexture = useZoneMediaTexture(zone.mediaUrl, zone.mediaKind)
   const texture = zone.enabled && uploadedTexture ? uploadedTexture : generatedTexture
 

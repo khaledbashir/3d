@@ -89,6 +89,7 @@ export function Header({ onOpenWizard, onPresent }: HeaderProps) {
   }
 
   const menuItems = [
+    { label: 'Venue OS / Output Forge', icon: <PresentIcon size={15} />, onClick: () => { window.location.assign('/venue-os/?mode=control-room') } },
     { label: 'Setup wizard', icon: <SetupIcon size={15} />, onClick: () => { setMenuOpen(false); onOpenWizard() } },
     { label: 'Save / load configs', icon: <SaveIcon size={15} />, onClick: () => { setMenuOpen(false); setSaveLoadOpen(true) } },
     { label: 'Export one-pager', icon: <ExportIcon size={15} />, onClick: () => { setMenuOpen(false); window.print() } },
@@ -178,6 +179,15 @@ export function Header({ onOpenWizard, onPresent }: HeaderProps) {
               </div>
             )}
           </div>
+
+          <button
+            onClick={() => window.location.assign('/venue-os/?mode=control-room')}
+            className="anc-present-button hidden md:inline-flex"
+            title="Open the ANC Venue OS command surface"
+          >
+            <PresentIcon size={15} />
+            <span>Venue OS</span>
+          </button>
 
           <button onClick={onPresent} className="anc-present-button">
             <PresentIcon size={15} />

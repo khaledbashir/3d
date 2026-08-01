@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#080b0c" />
+    <meta name="description" content="ANC Venue Twin and Arena Recovery — interactive sports-venue technology experiences." />
+    <link rel="icon" type="image/png" href="/venue-os/assets/brand/anc-blue.png" />
+    <title>ANC // ARENA RECOVERY</title>
+    <script type="module" crossorigin src="/venue-os/assets/index-BURydxU6.js"></script>
+    <link rel="stylesheet" crossorigin href="/venue-os/assets/index-DPZQsgIx.css">
+  </head>
+  <body class="is-pre-operation">
+    <main id="app">
+      <canvas id="game-canvas" aria-label="ANC Arena Recovery first-person experience"></canvas>
+      <div id="game-ui" aria-live="polite"></div>
+      <div id="touch-controls" aria-label="Touch controls">
+        <div id="touch-stick" aria-label="Movement control"><span></span></div>
+        <div class="touch-actions">
+          <button data-game-action="aim" aria-label="Aim">ADS</button>
+          <button data-game-action="interact" aria-label="Diagnose or repair">E</button>
+          <button class="touch-fire" data-game-action="fire" aria-label="Fire">FIRE</button>
+        </div>
+      </div>
+      <section id="anc-briefing" class="anc-briefing is-awaiting-operator" aria-label="ANC Arena Recovery mission briefing">
+        <div class="anc-briefing__grid" aria-hidden="true"></div>
+        <header class="anc-briefing__header">
+          <img src="/venue-os/assets/brand/anc-white.png" alt="ANC" />
+          <div><span id="briefing-division">FIELD OPERATIONS</span><strong id="briefing-incident">INCIDENT 07</strong></div>
+        </header>
+        <div class="anc-briefing__hero">
+          <div id="briefing-kicker" class="anc-briefing__kicker"><i></i> VENUE TECHNOLOGY // LIVE RECOVERY</div>
+          <h1>BRING THE<br /><span>VENUE</span> ONLINE.</h1>
+          <p id="briefing-copy">You are ANC Field Operations. Protect the infrastructure, restore the display network, and make every screen live before doors open.</p>
+          <button id="enter-operation" type="button"><span id="enter-operation-label">ENTER ARENA RECOVERY</span><b>01</b></button>
+        </div>
+        <aside class="anc-briefing__systems" aria-label="Venue system status">
+          <div class="anc-systems__title"><span id="briefing-contract">ANC VENUE NETWORK</span><b>RECOVERY REQUIRED</b></div>
+          <ol id="briefing-objectives">
+            <li class="is-active"><i></i><span>TECHNOLOGY</span><strong>DISPLAY CONTROL</strong></li>
+            <li><i></i><span>VENUE SERVICES</span><strong>FIELD OPERATIONS</strong></li>
+            <li><i></i><span>LIVE CONTENT</span><strong>SHOW CONTROL</strong></li>
+          </ol>
+          <dl>
+            <div><dt>DISPLAY ZONES</dt><dd>04 OFFLINE</dd></div>
+            <div><dt>SIGNAL PATH</dt><dd>DEGRADED</dd></div>
+            <div><dt>EVENT STATUS</dt><dd>DOORS IN 42:00</dd></div>
+          </dl>
+        </aside>
+        <footer class="anc-briefing__footer">
+          <span>THE FUTURE OF BRANDED ENTERTAINMENT</span>
+          <span>ANC // TECHNOLOGY · SERVICE · SPONSORSHIP</span>
+        </footer>
+      </section>
+      <div id="boot-screen"><img src="/venue-os/assets/brand/anc-white.png" alt="ANC" /><small>INITIALIZING ARENA RECOVERY</small></div>
+    </main>
+  </body>
+</html>
